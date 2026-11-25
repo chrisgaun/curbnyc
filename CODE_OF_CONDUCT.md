@@ -1,0 +1,2 @@
+# Code of conduct
+We welcome contributors of all backgrounds. Be respectful, constructive and inclusive. Harassment, threats, discrimination, personal attacks and publishing private information are unacceptable. Report conduct concerns privately to repository maintainers through GitHub's private contact mechanism when available; do not post sensitive details in public issues. Maintainers may remove content or restrict participation proportionately. Maintainers should protect reporter privacy and avoid retaliation.
