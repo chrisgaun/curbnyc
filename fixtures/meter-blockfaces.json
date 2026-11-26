@@ -1,0 +1,72 @@
+{
+  "104496": {
+    "pay_by_cel": "104496",
+    "on_street": "East 24 Street",
+    "side_of_st": "S",
+    "from_stree": "3 Avenue",
+    "to_street": "2 Avenue",
+    "borough": "Manhattan",
+    "vehicle_ty": "All Vehicles",
+    "all_vehicl": "2 Hours",
+    "all_vehi_1": "Monday-Saturday 9 AM-1 PM, 3 PM-7 PM",
+    "all_vehi_2": "$5.00 1st Hour / $8.25 2nd Hour",
+    "commerci_1": "N/A",
+    "meter_rate": "Zone M2"
+  },
+  "104933": {
+    "pay_by_cel": "104933",
+    "on_street": "West 41 Street",
+    "side_of_st": "S",
+    "from_stree": "Avenue of the Americas",
+    "to_street": "Broadway",
+    "borough": "Manhattan",
+    "vehicle_ty": "Dual (Commercial / All Vehicles)",
+    "all_vehicl": "6 Hours",
+    "all_vehi_1": "Monday-Friday 6 PM-12 AM, Saturday 8 AM-12 AM",
+    "all_vehi_2": "$5.50 1st Hour / $9.00 2nd Hour / $5.50 Add'l Hours",
+    "commerci_1": "Monday-Saturday 7 AM-6 PM",
+    "meter_rate": "Zone M1"
+  },
+  "300598": {
+    "pay_by_cel": "300598",
+    "on_street": "11 Avenue",
+    "side_of_st": "W",
+    "from_stree": "New Utrecht Avenue",
+    "to_street": "46 Street",
+    "borough": "Brooklyn",
+    "vehicle_ty": "All Vehicles",
+    "all_vehicl": "2 Hours (Mon-Thurs), 4 Hours (Fri)",
+    "all_vehi_1": "Monday-Friday 8:30 AM-7 PM",
+    "all_vehi_2": "$1.50 1st Hour / $2.50 2nd Hour (Mon-Thurs) / $1.50 per Hour (Friday)",
+    "commerci_1": "N/A",
+    "meter_rate": "Zone 3"
+  },
+  "301265": {
+    "pay_by_cel": "301265",
+    "on_street": "Bedford Avenue",
+    "side_of_st": "E",
+    "from_stree": "N 6 Street",
+    "to_street": "North 7 Street",
+    "borough": "Brooklyn",
+    "vehicle_ty": "All Vehicles",
+    "all_vehicl": "2 Hours",
+    "all_vehi_1": "Monday-Saturday 8:30 AM-7 PM",
+    "all_vehi_2": "$2.00 1st Hour / $3.00 2nd Hour",
+    "commerci_1": "N/A",
+    "meter_rate": "Zone 2"
+  },
+  "466707": {
+    "pay_by_cel": "466707",
+    "on_street": "37 Avenue",
+    "side_of_st": "S",
+    "from_stree": "72 Street",
+    "to_street": "73 Street",
+    "borough": "Queens",
+    "vehicle_ty": "All Vehicles",
+    "all_vehicl": "30 Minutes",
+    "all_vehi_1": "Monday-Saturday 8 AM-10 PM",
+    "all_vehi_2": "$1.00 per 30 Minutes",
+    "commerci_1": "N/A",
+    "meter_rate": "Zone 2"
+  }
+}
