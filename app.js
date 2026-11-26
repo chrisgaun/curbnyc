@@ -1,6 +1,10 @@
 import {category,distance} from './rules.js';
 const $=id=>document.getElementById(id), status=$('status'), results=$('results');
-const map=L.map('map').setView([40.7536,-73.9832],16); L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',{attribution:'© OpenStreetMap contributors',maxZoom:19}).addTo(map);
+const map=L.map('map',{minZoom:12,maxZoom:19}).setView([40.7536,-73.9832],16);
+// NYC GIS planimetric basemap and separate street labels, without business POIs.
+const tileOptions={minNativeZoom:8,maxNativeZoom:19,subdomains:'1234',bounds:L.latLngBounds([40.0341,-74.2727],[41.2919,-71.9101]),attribution:'<a href="https://gis.nyc.gov/tiles/">NYC GIS</a>'};
+L.tileLayer('https://maps{s}.nyc.gov/xyz/1.0.0/carto/basemap/{z}/{x}/{y}.jpg',tileOptions).addTo(map);
+L.tileLayer('https://maps{s}.nyc.gov/xyz/1.0.0/carto/label/{z}/{x}/{y}.png8',tileOptions).addTo(map);
 const layer=L.layerGroup().addTo(map); let center=[40.7536,-73.9832],generation=0;
 const colors={commercial:'#d97706',restriction:'#dc2626',meter:'#2563eb',unknown:'#64748b'};
 const labels={commercial:'Commercial / loading sign',restriction:'Restriction sign',meter:'Meter sign',unknown:'Review sign'};
