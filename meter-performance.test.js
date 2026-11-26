@@ -47,6 +47,9 @@ test('background geometry reuses covered extents and cancels obsolete requests',
  };
  refresh();
  await wait(3);
+ x=0.2;
+ refresh();
+ assert.ok(requests.every(request=>!request.signal.aborted));
  x=2;
  refresh();
  assert.ok(requests.every(request=>request.signal.aborted));

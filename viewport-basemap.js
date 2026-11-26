@@ -30,7 +30,18 @@ export function createBasemapLoader({getBounds,fetchGeometry,apply,report}){
  }
  async function update(viewport,buffer){
   const controller=new AbortController();
-  request={controller,viewport};
+  const coverage={...buffer};
+  for(const layer of layers){
+   const prior=cached(layer,viewport);
+   if(!prior)continue;
+   const bounds=prior.capped?viewport:prior.bounds;
+   coverage.w=Math.max(coverage.w,bounds.w);
+   coverage.e=Math.min(coverage.e,bounds.e);
+   coverage.s=Math.max(coverage.s,bounds.s);
+   coverage.n=Math.min(coverage.n,bounds.n);
+  }
+  const active={controller,viewport,coverage};
+  request=active;
   const results=await Promise.allSettled(layers.map(async layer=>{
    const prior=cached(layer,viewport);
    if(prior){show(layer,prior);return;}
@@ -42,7 +53,8 @@ export function createBasemapLoader({getBounds,fetchGeometry,apply,report}){
    let bounds=buffer,data=await fetchBounds(bounds);
    // A capped response may omit features inside the current viewport.
    if(data.features.length>=layer.limit&&!controller.signal.aborted){
-    bounds=viewport;
+    bounds=active.viewport;
+    active.coverage=bounds;
     data=await fetchBounds(bounds);
    }
    if(controller.signal.aborted)return;
@@ -62,7 +74,10 @@ export function createBasemapLoader({getBounds,fetchGeometry,apply,report}){
   clearTimeout(timer);
   const bounds=getBounds();
   const viewport={w:bounds.getWest(),e:bounds.getEast(),s:bounds.getSouth(),n:bounds.getNorth()};
-  if(request&&contains(request.viewport,viewport))return;
+  if(request&&contains(request.coverage,viewport)){
+   request.viewport=viewport;
+   return;
+  }
   request?.controller.abort();
   request=undefined;
   if(layers.every(layer=>cached(layer,viewport))){
