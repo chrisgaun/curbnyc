@@ -1,3 +1,5 @@
+import {setupDestinationSearch} from './destination-search.js';
+import {readMapPreferences,saveMapPreferences} from './map-preferences.js';
 import {plannedAspDays} from './asp-calendar.js';
 import {compileMeter} from './meter-schedule-v11.js';
 import {indexMeters} from './meter-spatial.js';
@@ -25,7 +27,10 @@ async function json(url,signal){
 function normalize(input){const raw=Array.isArray(input)?input:input?.features;if(!Array.isArray(raw))throw Error('Invalid data response');return raw.flatMap(row=>{const geometry=row.geometry||row.the_geom,p=row.properties||row;if(!['LineString','MultiLineString'].includes(geometry?.type))return [];const lines=geometry.type==='LineString'?[geometry.coordinates]:geometry.coordinates;if(!Array.isArray(lines)||!lines.length||!lines.every(line=>Array.isArray(line)&&line.length>=2&&line.every(c=>Array.isArray(c)&&Number.isFinite(c[0])&&Number.isFinite(c[1])&&c[0]>=-180&&c[0]<=180&&c[1]>=-90&&c[1]<=90)))return [];return [{type:'Feature',geometry,properties:Object.fromEntries(Object.entries(p).filter(([k,v])=>k!=='the_geom'&&k!=='geometry'&&typeof v==='string'))}];});}
 const nyClock=new Intl.DateTimeFormat('sv-SE',{timeZone:'America/New_York',year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit',hourCycle:'h23'});
 function nyNow(){return nyClock.format(new Date()).replace(' ','T');}
-const arrival=$('arrival'),stay=$('stay'),hide=$('hide-restricted');let live=true,gps=null,locationNote='Bryant Park preview',userMoved=false,locRequest=0;arrival.value=nyNow();
+const arrival=$('arrival'),stay=$('stay'),hide=$('hide-restricted'),radiusControl=$('radius');
+const preferences=readMapPreferences();
+radiusControl.value=preferences.radius;
+hide.checked=preferences.hideRestricted;let live=true,gps=null,locationNote='Bryant Park preview',userMoved=false,locRequest=0;arrival.value=nyNow();
 const color={paid:'#2563eb',inactive:'#26965c',restricted:'#cf4444',unknown:'#858b94'};
 const labels={paid:'Passenger parking · meter active',inactive:'No meter payment scheduled',restricted:'Avoid',unknown:'Check signs'};
 function valid(v){return v&&String(v).trim().toUpperCase()!=='N/A';}
@@ -93,13 +98,13 @@ function assess(feature,hours){
  if(!assessmentCache.has(feature))assessmentCache.set(feature,compileCache.get(feature)(arrival.value,hours));
  return assessmentCache.get(feature);
 }
-function render(){syncClock();if(!inventory)return;const radius=Number($('radius').value),hours=Number(stay.value);const key=arrival.value+'|'+hours;
+function render(){syncClock();if(!inventory)return;const radius=Number(radiusControl.value),hours=Number(stay.value);const key=arrival.value+'|'+hours;
  if(key!==assessmentKey){assessmentCache=new WeakMap();assessmentKey=key;}
  const local=inventory(center,radius);localCount=local.length;const counts={paid:0,inactive:0,restricted:0,unknown:0};
  const assessed=local.map(f=>{const e=assess(f,hours);counts[e.state]++;let nextText='';if(e.next){const t=timeLabel(e.next.at)+(e.next.at.slice(0,10)!==arrival.value.slice(0,10)?' next day':'');if(e.current==='paid'&&e.next.state==='inactive')nextText='Meter payment ends '+t;else if(e.next.state==='restricted')nextText='Commercial restriction starts '+t;else if(e.next.state==='paid')nextText='Meter payment starts '+t;else if(e.next.state==='unknown')nextText='Meter schedule needs review from '+t;else if(e.current==='restricted')nextText='Commercial schedule ends '+t;}
  let plannedText='';if(hours&&['paid','inactive'].includes(e.state)){if(e.cost!=null)plannedText='Estimated meter cost: $'+e.cost.toFixed(2)+' / '+stay.options[stay.selectedIndex].text;else if(e.paidMinutes!=null&&e.paidMinutes<hours*60)plannedText=e.paidMinutes+' min in scheduled paid hours. Check the meter for the charge.';else plannedText='Check the meter for the charge for this stay.';}
  return {...f,properties:{...f.properties,state:e.state,color:color[e.state],reason:e.reason,firstRate:e.firstRate??'',rateMinutes:e.rateMinutes,maxHours:e.maxHours??'',nextText,plannedText}};});
- visible=assessed.filter(f=>!hide.checked||f.properties.state!=='restricted');status.textContent=locationNote+' · '+counts.paid+' paid · '+counts.inactive+' no scheduled payment'+(counts.unknown?' · '+counts.unknown+' review':'')+(counts.restricted?' · '+counts.restricted+' avoid':'')+(meterLoadWarning?' · Refresh failed':meterDataStale?' · Older meter snapshot':'');
+ visible=assessed.filter(f=>!hide.checked||f.properties.state!=='restricted');status.textContent=locationNote+' · '+counts.paid+' paid · '+counts.inactive+' no scheduled payment'+(counts.unknown?' · '+counts.unknown+' review':'')+(counts.restricted?' · '+counts.restricted+' avoid':'')+(meterLoadWarning?' · Refresh failed':meterDataStale?' · Older meter snapshot':'')+(navigator.onLine===false?' · Offline':'');
  visibleById=new Map(visible.map(f=>[featureIds.get(f.geometry),f]));
  if(ready)map.getSource('meters').setData({type:'FeatureCollection',features:visible.map(f=>({
   type:'Feature',geometry:f.geometry,properties:{id:featureIds.get(f.geometry),color:f.properties.color}
@@ -118,7 +123,7 @@ function renderFocus(){
  ]});
 }
 let featureIds=new WeakMap(),visibleById=new Map(),nextFeatureId=0;
-arrival.onchange=()=>{live=false;render();};stay.onchange=render;hide.onchange=render;$('now').onclick=()=>{live=true;render();};$('settings').onclick=()=>{$('settings-panel').showModal();};$('done').onclick=()=>{$('settings-panel').close();render();};
+arrival.onchange=()=>{live=false;render();};stay.onchange=render;$('now').onclick=()=>{live=true;render();};$('settings').onclick=()=>{$('settings-panel').showModal();};$('done').onclick=()=>{$('settings-panel').close();render();};
 setInterval(()=>{if(live&&arrival.value!==nyNow())render();},15000);
 document.addEventListener('visibilitychange',()=>{if(!document.hidden&&live)render();});
 const snapshotStatus=$('snapshot-status');
@@ -196,7 +201,24 @@ const basemap=createBasemapLoader({
 });
 function move(p,note){center=p;locationNote=note;if(ready)map.jumpTo({center:p,zoom:16});render();}
 function locate(auto=false){const id=++locRequest;if(!navigator.geolocation){locationNote='Location unavailable · Bryant Park preview';render();return;}if(!auto)userMoved=false;locationNote='Finding your location…';render();navigator.geolocation.getCurrentPosition(p=>{if(id!==locRequest)return;gps=[p.coords.longitude,p.coords.latitude];renderFocus();if(!userMoved)move(gps,'Near you');else render();},e=>{if(id!==locRequest)return;locationNote='Location unavailable · browsing map';render();if(!inventory)status.textContent=locationNote;},{timeout:12000,maximumAge:30000,enableHighAccuracy:true});}
-$('radius').onchange=render;$('retry').onclick=load;$('loc').onclick=()=>locate(false);$('bryant').onclick=()=>{userMoved=true;++locRequest;move([...bryant],'Bryant Park');};
+function updateMapPreferences(){
+ saveMapPreferences({radius:radiusControl.value,hideRestricted:hide.checked});
+ render();
+}
+radiusControl.onchange=updateMapPreferences;
+hide.onchange=updateMapPreferences;
+window.addEventListener('online',render);
+window.addEventListener('offline',render);
+setupDestinationSearch({
+ open:$('search-toggle'),dialog:$('search-panel'),form:$('search-form'),
+ input:$('destination'),status:$('search-status'),results:$('search-results'),close:$('search-close'),
+ onSelect:({center:destination,label,borough})=>{
+  userMoved=true;
+  ++locRequest;
+  move(destination,label+' · '+borough);
+ }
+});
+$('retry').onclick=load;$('loc').onclick=()=>locate(false);$('bryant').onclick=()=>{userMoved=true;++locRequest;move([...bryant],'Bryant Park');};
 try{const attribution='NYC Open Data';map=new maplibregl.Map({container:'map',center,zoom:16,minZoom:14,maxZoom:19,style:{version:8,glyphs:'https://demotiles.maplibre.org/font/{fontstack}/{range}.pbf',sources:Object.fromEntries(['buildings','parks','streets','meters','focus'].map(n=>[n,{type:'geojson',data:empty(),attribution}])),layers:[
 {id:'background',type:'background',paint:{'background-color':'#eeeee8'}},{id:'parks',type:'fill',source:'parks',paint:{'fill-color':'#c8dbc0'}},{id:'buildings',type:'fill',source:'buildings',paint:{'fill-color':'#d6d7d2','fill-outline-color':'#c7c9c3'}},{id:'road-outline',type:'line',source:'streets',paint:{'line-color':'#d1d3cd','line-width':['interpolate',['linear'],['zoom'],14,5,16,15,19,65]}},{id:'roads',type:'line',source:'streets',paint:{'line-color':'#fff','line-width':['interpolate',['linear'],['zoom'],14,3,16,13,19,63]}},{id:'street-names',type:'symbol',source:'streets',layout:{'symbol-placement':'line','text-field':['coalesce',['get','st_label'],['get','street'],['get','full_stree'],''],'text-font':['Noto Sans Regular'],'text-size':11},paint:{'text-color':'#505a5d','text-halo-color':'#fff','text-halo-width':1}},{id:'meters',type:'line',source:'meters',layout:{'line-cap':'round','line-join':'round'},paint:{'line-color':['coalesce',['get','color'],'#858b94'],'line-width':['interpolate',['linear'],['zoom'],14,3,16,6,19,9]}},{id:'focus',type:'circle',source:'focus',paint:{'circle-radius':7,'circle-color':'#2265bf','circle-stroke-width':2,'circle-stroke-color':'#fff'}}]}});
 map.addControl(new maplibregl.NavigationControl({showCompass:false}),'top-right');map.once('load',()=>{ready=true;map.jumpTo({center});render();renderFocus();basemap();map.on('dragstart',()=>{userMoved=true;});map.on('moveend',()=>{const c=map.getCenter();const moved=Math.hypot(c.lng-center[0],c.lat-center[1])>0.00001;if(moved){center=[c.lng,c.lat];locationNote='Browsing map';render();}basemap();});map.on('click','meters',e=>{const p=visibleById.get(e.features[0].properties.id)?.properties;if(!p)return;const node=document.createElement('div');card(p,node);new maplibregl.Popup({maxWidth:'300px'}).setLngLat(e.lngLat).setDOMContent(node).addTo(map);});});map.on('error',e=>{if(!ready)mapStatus.textContent='Map error: '+(e.error?.message||'Map could not initialize')+'; meter list works independently.';});setTimeout(()=>{if(!ready)mapStatus.textContent='Map not ready. Meter list loads independently.';},12000);
