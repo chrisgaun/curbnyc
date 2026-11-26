@@ -1,0 +1,61 @@
+name: Publish Alpha 1
+on:
+  push:
+    branches: [main]
+    paths: ['.github/workflows/publish-alpha1.yml']
+  workflow_dispatch:
+permissions:
+  contents: write
+concurrency:
+  group: publish-alpha1
+  cancel-in-progress: false
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    env:
+      GH_TOKEN: ${{ github.token }}
+      GH_REPO: ${{ github.repository }}
+      TAG: v0.1.0-alpha.1
+      TARGET: 2a0bee6384c4bd7701af808e40b43bb35bd3b078
+    steps:
+      - name: Publish approved commit
+        shell: bash
+        run: |
+          set -euo pipefail
+          if gh release view "$TAG" --json tagName >/dev/null 2>&1; then
+            echo "Release already exists; leaving it unchanged."
+            exit 0
+          fi
+          if gh api "repos/$GH_REPO/git/ref/tags/$TAG" >/tmp/tag.json 2>/dev/null; then
+            actual=$(jq -r '.object.sha' /tmp/tag.json)
+            if [ "$actual" != "$TARGET" ]; then
+              echo "Existing tag does not point to approved commit; refusing to publish."
+              exit 1
+            fi
+          fi
+          cat >/tmp/release-notes.md <<'NOTES'
+          ## Alpha 1
+
+          First public pre-release of CurbNYC, based on the user-approved v0.12 build.
+
+          [Open CurbNYC](https://chrisgaun.github.io/curbnyc/)
+
+          ### Included
+          - Minimal NYC map with official metered curb blockfaces.
+          - Current location and NYC local time on opening, subject to device permission.
+          - Pan to explore nearby meter locations; location button to recenter.
+          - Passenger meter schedule classification, payment hours, commercial restrictions, published rate estimates and next schedule changes.
+          - Optional arrival time, parking duration, search radius and restricted-curb visibility.
+          - Concise curb summaries and expanded, grouped meter schedules.
+          - MIT-licensed source and automated tests.
+
+          ### Limitations
+          - Alpha software: meter schedules are not complete legal parking determinations or live vacancy information.
+          - Non-metered streets, hydrants, bus stops, other posted signs and temporary restrictions are not evaluated.
+          - Verify posted signs and applicable rates; ambiguous schedules remain unknown.
+          - Android installation and device-level GPS behavior have not been independently verified.
+
+          Approved source: 2a0bee6384c4bd7701af808e40b43bb35bd3b078 (v0.12).
+          NOTES
+          gh release create "$TAG" --target "$TARGET" --title "CurbNYC — Alpha 1" --prerelease --notes-file /tmp/release-notes.md
+          gh release view "$TAG" --json url,tagName,isPrerelease
