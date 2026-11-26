@@ -1,3 +1,5 @@
+import {isMeterHoliday} from './asp-calendar.js';
+
 // Evaluates the published meter schedule only, never all curb restrictions.
 const DAYS=['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
 const absent=v=>!v||/^(N\/A|NONE|-)$/i.test(String(v).trim());
@@ -93,7 +95,6 @@ function weekdayLimits(value){
  return day=>match?(day===5?Number(match[2]):day>=1&&day<=4?Number(match[1]):0)*60||null:null;
 }
 // New York civil time. Actual elapsed times on DST transition dates need separate handling.
-function holiday(d){const m=d.getUTCMonth(),n=d.getUTCDate(),w=d.getUTCDay();return (m===0&&n===1)||(m===4&&w===1&&n>=25)||(m===6&&n===4)||(m===8&&w===1&&n<=7)||(m===10&&w===4&&n>=22&&n<=28)||(m===11&&n===25);}
 function dstDay(d){const y=d.getUTCFullYear(),m=d.getUTCMonth(),n=d.getUTCDate();return (m===2&&n===8+(7-new Date(Date.UTC(y,2,1)).getUTCDay())%7)||(m===10&&n===1+(7-new Date(Date.UTC(y,10,1)).getUTCDay())%7);}
 export function compileMeter(p){
  const passenger=parseSchedule(p.all_vehi_1),commercial=parseSchedule(p.commerci_1);
@@ -115,7 +116,7 @@ function evaluateCompiled(p,arrival,hours,passenger,commercial,limit,rate){
  // Preserve explicit commercial restrictions even on no-payment holidays: posted exceptions are not in this dataset.
  if(active(commercial,day,minute))return 'restricted';
  if(type==='Commercial Only')return 'unknown';
- if(day!==0&&!holiday(d)&&active(passenger,day,minute))return 'paid';return 'inactive';};
+ if(day!==0&&!isMeterHoliday(d)&&active(passenger,day,minute))return 'paid';return 'inactive';};
  const current=at(0);
  // The state can change only at a schedule endpoint or at midnight.
  const minuteOfDay=start.getUTCHours()*60+start.getUTCMinutes();

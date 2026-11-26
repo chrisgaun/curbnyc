@@ -1,3 +1,4 @@
+import {plannedAspDays} from './asp-calendar.js';
 import {compileMeter} from './meter-schedule-v11.js';
 import {indexMeters} from './meter-spatial.js';
 import {createBasemapLoader} from './viewport-basemap.js';
@@ -60,7 +61,31 @@ function card(p,node){el('strong',heading(p),node);const title=el('div',labels[p
  if(p.state==='restricted'||p.state==='unknown')el('div',p.reason||'',node);
  if(p.maxHours)el('small',(p.maxHours<1?p.maxHours*60+' min':p.maxHours+'h')+' posted meter limit'+(p.pay_by_cel?' · Zone '+p.pay_by_cel:''),node);else if(p.pay_by_cel)el('small','ParkNYC zone '+p.pay_by_cel,node);
  const more=el('details','',node);more.className='meter-schedule';el('summary','Full meter schedule',more);details(p,more);el('small','Meter schedule only. Check all posted signs.',node).className='caveat';}
-function syncClock(){if(live)arrival.value=nyNow();$('time-label').textContent=live?'Now':arrival.value.replace('T',' ');if(Number(stay.value))$('time-label').textContent+=' · '+stay.options[stay.selectedIndex].text;}
+let lastAspWindow;
+const aspDate=new Intl.DateTimeFormat('en-US',{month:'short',day:'numeric',year:'numeric',timeZone:'UTC'});
+function syncClock(){
+ if(live)arrival.value=nyNow();
+ $('time-label').textContent=live?'Now':arrival.value.replace('T',' ');
+ if(Number(stay.value))$('time-label').textContent+=' · '+stay.options[stay.selectedIndex].text;
+ const key=arrival.value+'|'+stay.value;
+ if(key===lastAspWindow)return;
+ lastAspWindow=key;
+ const planned=plannedAspDays(arrival.value,Number(stay.value));
+ const note=$('asp-status');
+ if(!planned){
+  note.textContent='Choose a valid NYC arrival time to check the planned street cleaning calendar.';
+  return;
+ }
+ const list=days=>days.map(day=>aspDate.format(new Date(day.day+'T00:00Z'))).join(', ');
+ const suspended=planned.days.filter(day=>day.status==='planned-suspension');
+ const missing=planned.days.filter(day=>day.status==='unavailable');
+ const reported=suspended.length?'Planned street cleaning suspension: '+list(suspended)+'.':
+  missing.length===planned.days.length?'':
+  missing.length?'No planned holiday suspension listed for '+list(planned.days.filter(day=>day.status==='not-listed'))+'.':
+  'No planned holiday suspension listed for your selected time.';
+ const unavailable=missing.length?' Calendar unavailable for '+list(missing)+'.':'';
+ note.textContent=(reported+unavailable).trim()+' DOT calendar verified '+planned.checked+'.';
+}
 const nearbyPanel=$('nearby-panel');
 let compileCache=new WeakMap(),assessmentCache=new WeakMap(),assessmentKey='';
 function assess(feature,hours){
