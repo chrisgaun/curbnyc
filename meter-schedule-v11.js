@@ -27,13 +27,21 @@ export function rateEstimate(value,hours){
 // New York civil time. Actual elapsed times on DST transition dates need separate handling.
 function holiday(d){const m=d.getUTCMonth(),n=d.getUTCDate(),w=d.getUTCDay();return (m===0&&n===1)||(m===4&&w===1&&n>=25)||(m===6&&n===4)||(m===8&&w===1&&n<=7)||(m===10&&w===4&&n>=22&&n<=28)||(m===11&&n===25);}
 function dstDay(d){const y=d.getUTCFullYear(),m=d.getUTCMonth(),n=d.getUTCDate();return (m===2&&n===8+(7-new Date(Date.UTC(y,2,1)).getUTCDay())%7)||(m===10&&n===1+(7-new Date(Date.UTC(y,10,1)).getUTCDay())%7);}
+export function compileMeter(p){
+ const passenger=parseSchedule(p.all_vehi_1),commercial=parseSchedule(p.commerci_1);
+ const max=String(p.all_vehicl||'').match(/^(\d+) Hours?$/i);
+ const firstRate=rateEstimate(p.all_vehi_2,1);
+ return (arrival,hours=0)=>evaluateCompiled(p,arrival,hours,passenger,commercial,max,firstRate);
+}
 export function evaluate(p,arrival,hours=0){
+ return compileMeter(p)(arrival,hours);
+}
+function evaluateCompiled(p,arrival,hours,passenger,commercial,max,firstRate){
  const type=p.vehicle_ty,result=(state,reason,extra={})=>({state,reason,cost:null,...extra});
  if(!['All Vehicles','Dual (Commercial / All Vehicles)','Commercial Only','Charter Bus Only'].includes(type))return result('unknown','Vehicle type needs review');
  if(type==='Charter Bus Only')return result('restricted','Charter bus meter');
  const start=new Date(arrival+'Z');
  if(!/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}$/.test(arrival)||!Number.isFinite(+start)||!Number.isInteger(hours)||hours<0||hours>6)return result('unknown','Invalid arrival or duration');
- const passenger=parseSchedule(p.all_vehi_1),commercial=parseSchedule(p.commerci_1);
  if(!passenger||!commercial||(type!=='Commercial Only'&&!passenger.length)||(type!=='All Vehicles'&&!commercial.length))return result('unknown','Meter schedule needs review');
  const active=(windows,d,m)=>windows.some(w=>w.day===d&&m>=w.start&&m<w.end);
  const at=i=>{const d=new Date(+start+i*60000);if(dstDay(d))return 'unknown';const day=d.getUTCDay(),minute=d.getUTCHours()*60+d.getUTCMinutes();
@@ -41,13 +49,41 @@ export function evaluate(p,arrival,hours=0){
  if(active(commercial,day,minute))return 'restricted';
  if(type==='Commercial Only')return 'unknown';
  if(day!==0&&!holiday(d)&&active(passenger,day,minute))return 'paid';return 'inactive';};
- const current=at(0),max=String(p.all_vehicl||'').match(/^(\d+) Hours?$/i),firstRate=rateEstimate(p.all_vehi_2,1);
- let next=null;for(let i=1;i<=1440;i++){const state=at(i);if(state!==current){next={at:new Date(+start+i*60000).toISOString().slice(0,16),state};break;}}
+ const current=at(0);
+ // The state can change only at a schedule endpoint or at midnight.
+ const minuteOfDay=start.getUTCHours()*60+start.getUTCMinutes();
+ const midnight=1440-minuteOfDay;
+ const boundaries=new Set([midnight]);
+ for(const {day,start:from,end:to} of [...passenger,...commercial]){
+  const dayOffset=(day-start.getUTCDay()+7)%7;
+  if(dayOffset>1)continue;
+  for(const endpoint of [from,to]){
+   const offset=dayOffset*1440+endpoint-minuteOfDay;
+   if(offset>0&&offset<=1440)boundaries.add(offset);
+  }
+ }
+ const intervals=[{offset:0,state:current}];
+ for(const offset of [...boundaries].sort((a,b)=>a-b)){
+  const state=at(offset);
+  if(state!==intervals.at(-1).state)intervals.push({offset,state});
+ }
+ const change=intervals[1];
+ const next=change?{at:new Date(+start+change.offset*60000).toISOString().slice(0,16),state:change.state}:null;
  const extra={current,next,firstRate,maxHours:max?Number(max[1]):null};
  if(current==='restricted')return result('restricted','Commercial vehicles only during this time',extra);
  if(current==='unknown')return result('unknown','Passenger eligibility not established',extra);
- let paid=0,run=0,longest=0;
- for(let i=0;i<hours*60;i++){const state=at(i);if(state==='restricted')return result('restricted','Commercial restriction starts during your planned stay',extra);if(state==='unknown')return result('unknown','Part of your planned stay needs review',extra);if(state==='paid'){paid++;run++;longest=Math.max(longest,run);}else run=0;}
+ let paid=0,longest=0;
+ const duration=hours*60;
+ for(let i=0;i<intervals.length&&intervals[i].offset<duration;i++){
+  const {offset,state}=intervals[i];
+  if(state==='restricted')return result('restricted','Commercial restriction starts during your planned stay',extra);
+  if(state==='unknown')return result('unknown','Part of your planned stay needs review',extra);
+  if(state==='paid'){
+   const minutes=Math.min(duration,intervals[i+1]?.offset??duration)-offset;
+   paid+=minutes;
+   longest=Math.max(longest,minutes);
+  }
+ }
  if(hours&&paid&&!max)return result('unknown','Passenger meter limit needs review',extra);
  if(hours&&max&&longest>Number(max[1])*60)return result('restricted','Planned stay exceeds posted meter limit',extra);
  const cost=hours&&paid===hours*60?rateEstimate(p.all_vehi_2,hours):hours&&paid===0?0:null;

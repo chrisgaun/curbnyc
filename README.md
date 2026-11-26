@@ -1,21 +1,30 @@
 # CurbNYC
 
-Experimental, mobile-first NYC parking sign explorer. Not a parking authorization or vacancy service. Version 0.1 displays live raw sign points, if the NYC API schema and network permit. No curb matching, schedule evaluation, holiday logic or meter pricing yet. Arrival/stay inputs are placeholders. Pilot uses an approximate Manhattan bounding box (not a borough boundary).
+CurbNYC is a free, open-source NYC parking map. It shows official NYC meter blockfaces near the center of the map, with passenger-meter hours, published rates, and commercial restrictions when the meter schedule supports them.
 
-## Run
+[Open the map](https://chrisgaun.github.io/curbnyc/)
 
-Serve this directory with `python3 -m http.server 8000` and open http://localhost:8000. For Android, deploy to an HTTPS static host (GitHub Pages works), open in Chrome and use Add to Home screen. GPS requires HTTPS or localhost. Internet required for live signs and tiles. Anonymous API queries can be throttled. No location is stored by the app; NYC Open Data and map tile providers receive network requests that may reveal approximate location.
+## Use the map
 
-## Data and design
+Allow location access to start near your position or browse from Bryant Park. Tap a colored curb for its schedule, or use Settings to change arrival time, stay length, and search radius. Expand **Data and nearby meters** for the nearby list.
 
-- Signs: https://data.cityofnewyork.us/d/nfid-uabd
-- Meter blockfaces: https://data.cityofnewyork.us/d/e7yp-wx55
-- Meter zones: https://data.cityofnewyork.us/d/f72k-2u3b
-- Rules: https://www.nyc.gov/html/dot/html/motorist/parking-regulations.shtml
-- ASP: https://www.nyc.gov/html/dot/html/motorist/alternate-side-parking.shtml
+Check all posted signs. A curb with no scheduled meter payment can still have other restrictions. The app does not determine vacancy or cover hydrants, alternate-side rules, temporary restrictions, or unmapped curbs.
 
-Next: validate schema and actual data against field signs; ingest daily snapshots, map sign arrows to curb geometry using street centerlines and side, interpret overlapping schedules and exceptions, join passenger meter rate segments, model stay duration and price changes, then add hydrants and temporary restrictions. Default unknown if coverage or interpretation is incomplete. Do not color a curb legal based on absence of signs. Use America/New_York civil time. Field-test Bryant Park and expand only after validation. A future PostGIS database can store source snapshots, sign points, curb segments, normalized rules, and price intervals. No database is required for the raw sign prototype.
+## Develop locally
 
-## Testing
+Run `python3 -m http.server 8000` from the repository root and open `http://localhost:8000`. Browser geolocation requires HTTPS or localhost. Run `npm test` for the schedule, spatial selection, and background request tests.
 
-`npm test` runs basic classifier and distance tests. Browser integration and live API requests are not verified. See CONTRIBUTING.md and SECURITY.md. Code MIT; data and tiles retain their respective terms.
+The active entry point is `index.html`. It uses MapLibre GL JS and official NYC Open Data for [meter blockfaces](https://data.cityofnewyork.us/d/e7yp-wx55), [streets](https://data.cityofnewyork.us/d/inkn-q76z), [buildings](https://data.cityofnewyork.us/d/5zhs-2jue), and [parks](https://data.cityofnewyork.us/d/y6ja-fw4f). Background requests include the map viewport. The code is MIT-licensed. Source data and third-party assets have their own terms.
+
+The [Alpha 1 release](https://github.com/chrisgaun/curbnyc/releases/tag/v0.1.0-alpha.1) records the approved v0.12 build. `meters-baseline.html` is the independent meter-layer reference.
+
+## Midtown vector tile pilot
+
+`scripts/prototype_basemap_tiles.cjs` generates static XYZ Mapbox Vector Tiles for zooms 14–16 around Bryant Park and Times Square. Use Node.js 22.12+ and install the pilot tools outside the checkout:
+
+```sh
+npm install --prefix /tmp/curb-tile-tools geojson-vt@5.0.4 vt-pbf@3.1.3
+NODE_PATH=/tmp/curb-tile-tools/node_modules node scripts/prototype_basemap_tiles.cjs INPUT_DIR OUTPUT_DIR
+```
+
+Supply `streets.geojson`, `buildings.geojson`, and `parks.geojson` from the datasets above, covering west −73.995, south 40.744, east −73.974, and north 40.764. Serve the output as `{z}/{x}/{y}.pbf` with NYC Open Data attribution. The PBF source layers are named `streets`, `buildings`, and `parks`. The street label field is `st_label`. The app continues to use the viewport loader while the pilot is evaluated.
