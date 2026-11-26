@@ -1,0 +1,11 @@
+import {test} from 'node:test';import assert from 'node:assert/strict';import {evaluate,parseSchedule,rateEstimate} from './meter-schedule.js';
+const dual={vehicle_ty:'Dual (Commercial / All Vehicles)',all_vehicl:'6 Hours',all_vehi_1:'Monday-Friday 6 PM-12 AM, Saturday 8 AM-12 AM',all_vehi_2:"$5.50 1st Hour / $9.00 2nd Hour / $5.50 Add'l Hours",commerci_1:'Monday-Friday 8 AM-6 PM'};
+test('weekday commercial',()=>assert.equal(evaluate(dual,'2026-11-30T14:00',2).state,'restricted'));
+test('Saturday passenger and tiered price',()=>assert.deepEqual([evaluate(dual,'2026-11-28T14:00',2).state,evaluate(dual,'2026-11-28T14:00',2).cost],['paid',14.5]));
+test('Sunday no scheduled payment',()=>assert.equal(evaluate(dual,'2026-11-29T14:00',2).state,'inactive'));
+test('midnight crossing',()=>assert.equal(evaluate(dual,'2026-11-28T23:00',2).state,'unknown'));
+test('commercial overlaps even if passenger also active',()=>assert.equal(evaluate({...dual,commerci_1:'Monday-Saturday 7 AM-6 PM'},'2026-11-28T14:00',2).state,'restricted'));
+test('maximum stay and unsupported price',()=>{assert.equal(evaluate({...dual,all_vehicl:'1 Hour'},'2026-11-28T14:00',2).state,'restricted');assert.equal(rateEstimate('$1.50 per Hour (Friday)',2),null);});
+test('unknown schedule is not green',()=>assert.equal(evaluate({...dual,all_vehi_1:'SPECIAL EVENTS'},'2026-11-29T14:00',2).state,'unknown'));
+test('overnight schedule and tiered price',()=>{assert.deepEqual(parseSchedule('Monday 8 PM-2 AM'),[{day:1,start:1200,end:1440},{day:2,start:0,end:120}]);assert.equal(rateEstimate(dual.all_vehi_2,3),20);});
+test('commercial-only outside hours is meter inactive not legal approval',()=>assert.equal(evaluate({...dual,vehicle_ty:'Commercial Only',all_vehi_1:'N/A'},'2026-11-29T14:00',2).state,'inactive'));
