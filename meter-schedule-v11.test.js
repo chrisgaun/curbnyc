@@ -1,0 +1,10 @@
+import {test} from 'node:test';import assert from 'node:assert/strict';import {evaluate} from './meter-schedule-v11.js';
+const p={vehicle_ty:'Dual (Commercial / All Vehicles)',all_vehicl:'6 Hours',all_vehi_1:'Monday-Friday 6 PM-12 AM, Saturday 8 AM-12 AM',all_vehi_2:"$5.50 1st Hour / $9.00 2nd Hour / $5.50 Add'l Hours",commerci_1:'Monday-Saturday 7 AM-6 PM'};
+test('screenshot: paid now, unpaid after midnight, not unknown',()=>{const x=evaluate(p,'2026-11-25T22:36',2);assert.equal(x.state,'paid');assert.equal(x.next.at,'2026-11-26T00:00');assert.equal(x.next.state,'inactive');assert.equal(x.paidMinutes,84);assert.equal(x.firstRate,5.5);assert.equal(x.cost,null);});
+test('commercial hours',()=>assert.equal(evaluate(p,'2026-11-25T14:00').state,'restricted'));
+test('Sunday',()=>assert.equal(evaluate(p,'2026-11-29T14:00').state,'inactive'));
+test('transition into commercial period',()=>assert.equal(evaluate(p,'2026-11-25T06:30',1).state,'restricted'));
+test('full paid duration',()=>assert.equal(evaluate(p,'2026-11-25T19:00',2).cost,14.5));
+test('commercial only outside hours unknown',()=>assert.equal(evaluate({...p,vehicle_ty:'Commercial Only',all_vehi_1:''},'2026-11-25T22:00').state,'unknown'));
+test('holiday payment suspended',()=>assert.equal(evaluate(p,'2026-11-26T20:00').state,'inactive'));
+test('unknown schedule stays unknown',()=>assert.equal(evaluate({...p,all_vehi_1:'weird'},'2026-11-25T22:00').state,'unknown'));
