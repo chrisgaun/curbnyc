@@ -6,8 +6,8 @@ import {createBasemapLoader} from './viewport-basemap.js';
 import {evaluate} from './meter-schedule-v11.js';
 
 test('indexed line selection matches the full scan along the NYC fixture route',()=>{
- const features=JSON.parse(readFileSync(new URL('./data/meters.json',import.meta.url)))
-  .map(row=>({geometry:row.the_geom}));
+ const snapshot=JSON.parse(readFileSync(new URL('./data/meters.json',import.meta.url)));
+ const features=(Array.isArray(snapshot)?snapshot:snapshot.features).map(row=>({geometry:row.the_geom}));
  const indexed=indexMeters(features);
  for(const center of [[-73.9832,40.7536],[-73.9855,40.758],[-73.957,40.7148]]){
   for(const radius of [250,500,800,1200]){

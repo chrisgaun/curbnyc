@@ -4,6 +4,7 @@ on:
   schedule:
     - cron: '17 9 2 * *'
   push:
+    branches: [main]
     paths:
       - '.github/workflows/meters.yml'
       - 'scripts/sync_meters.py'
@@ -14,6 +15,7 @@ concurrency:
   cancel-in-progress: false
 jobs:
   sync:
+    if: github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -30,3 +32,8 @@ jobs:
           git commit -m "Refresh NYC meter data"
           git pull --rebase
           git push
+      - name: Report failed refresh
+        if: failure()
+        run: |
+          echo "::warning::NYC meter refresh failed. The last published snapshot remains available."
+          echo "NYC meter refresh failed. Check the failing step before retrying." >> "$GITHUB_STEP_SUMMARY"

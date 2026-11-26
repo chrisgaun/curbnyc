@@ -50,13 +50,17 @@ function details(p,parent){
  scheduleSection(wrap,'Commercial parking',valid(p.commerci_1)?String(p.commerci_1).split(/,\s*/):[]);
 }
 function card(p,node){el('strong',heading(p),node);const title=el('div',labels[p.state]||'Check signs',node);title.className='curb-state';title.style.color=color[p.state]||color.unknown;
- if(p.state==='paid'&&p.firstRate!==''&&p.firstRate!=null)el('div','$'+Number(p.firstRate).toFixed(2)+' first hour',node).className='price';
+ if(p.state==='paid'){
+  const rate=p.firstRate===''||p.firstRate==null?'Meter rate needs review'
+   :'$'+Number(p.firstRate).toFixed(2)+(p.rateMinutes===60?' first hour':' per '+p.rateMinutes+' min');
+  el('div',rate,node).className=p.firstRate===''?'':'price';
+ }
  if(p.nextText)el('div',p.nextText,node);
  if(p.plannedText)el('div',p.plannedText,node);
  if(p.state==='restricted'||p.state==='unknown')el('div',p.reason||'',node);
- if(p.maxHours)el('small',p.maxHours+'h posted meter limit'+(p.pay_by_cel?' · Zone '+p.pay_by_cel:''),node);else if(p.pay_by_cel)el('small','ParkNYC zone '+p.pay_by_cel,node);
+ if(p.maxHours)el('small',(p.maxHours<1?p.maxHours*60+' min':p.maxHours+'h')+' posted meter limit'+(p.pay_by_cel?' · Zone '+p.pay_by_cel:''),node);else if(p.pay_by_cel)el('small','ParkNYC zone '+p.pay_by_cel,node);
  const more=el('details','',node);more.className='meter-schedule';el('summary','Full meter schedule',more);details(p,more);el('small','Meter schedule only. Check all posted signs.',node).className='caveat';}
-function syncClock(){if(live)arrival.value=nyNow();$('time-label').textContent=live?'Now':arrival.value.replace('T',' ');if(Number(stay.value))$('time-label').textContent+=' · '+stay.value+'h';}
+function syncClock(){if(live)arrival.value=nyNow();$('time-label').textContent=live?'Now':arrival.value.replace('T',' ');if(Number(stay.value))$('time-label').textContent+=' · '+stay.options[stay.selectedIndex].text;}
 const nearbyPanel=$('nearby-panel');
 let compileCache=new WeakMap(),assessmentCache=new WeakMap(),assessmentKey='';
 function assess(feature,hours){
@@ -67,10 +71,10 @@ function assess(feature,hours){
 function render(){syncClock();if(!inventory)return;const radius=Number($('radius').value),hours=Number(stay.value);const key=arrival.value+'|'+hours;
  if(key!==assessmentKey){assessmentCache=new WeakMap();assessmentKey=key;}
  const local=inventory(center,radius);localCount=local.length;const counts={paid:0,inactive:0,restricted:0,unknown:0};
- const assessed=local.map(f=>{const e=assess(f,hours);counts[e.state]++;let nextText='';if(e.next){const t=timeLabel(e.next.at)+(e.next.at.slice(0,10)!==arrival.value.slice(0,10)?' next day':'');if(e.current==='paid'&&e.next.state==='inactive')nextText='Meter payment ends '+t;else if(e.next.state==='restricted')nextText='Commercial restriction starts '+t;else if(e.next.state==='paid')nextText='Meter payment starts '+t;else if(e.current==='restricted')nextText='Commercial schedule ends '+t;}
- let plannedText='';if(hours&&['paid','inactive'].includes(e.state)){if(e.cost!=null)plannedText='Estimated meter cost: $'+e.cost.toFixed(2)+' / '+hours+'h';else if(e.paidMinutes!=null&&e.paidMinutes<hours*60)plannedText=e.paidMinutes+' min of planned stay in paid hours; exact charge varies';}
- return {...f,properties:{...f.properties,state:e.state,color:color[e.state],reason:e.reason,firstRate:e.firstRate??'',maxHours:e.maxHours??'',nextText,plannedText}};});
- visible=assessed.filter(f=>!hide.checked||f.properties.state!=='restricted');status.textContent=locationNote+' · '+counts.paid+' paid · '+counts.inactive+' no scheduled payment'+(counts.unknown?' · '+counts.unknown+' review':'')+(counts.restricted?' · '+counts.restricted+' avoid':'');
+ const assessed=local.map(f=>{const e=assess(f,hours);counts[e.state]++;let nextText='';if(e.next){const t=timeLabel(e.next.at)+(e.next.at.slice(0,10)!==arrival.value.slice(0,10)?' next day':'');if(e.current==='paid'&&e.next.state==='inactive')nextText='Meter payment ends '+t;else if(e.next.state==='restricted')nextText='Commercial restriction starts '+t;else if(e.next.state==='paid')nextText='Meter payment starts '+t;else if(e.next.state==='unknown')nextText='Meter schedule needs review from '+t;else if(e.current==='restricted')nextText='Commercial schedule ends '+t;}
+ let plannedText='';if(hours&&['paid','inactive'].includes(e.state)){if(e.cost!=null)plannedText='Estimated meter cost: $'+e.cost.toFixed(2)+' / '+stay.options[stay.selectedIndex].text;else if(e.paidMinutes!=null&&e.paidMinutes<hours*60)plannedText=e.paidMinutes+' min in scheduled paid hours. Check the meter for the charge.';else plannedText='Check the meter for the charge for this stay.';}
+ return {...f,properties:{...f.properties,state:e.state,color:color[e.state],reason:e.reason,firstRate:e.firstRate??'',rateMinutes:e.rateMinutes,maxHours:e.maxHours??'',nextText,plannedText}};});
+ visible=assessed.filter(f=>!hide.checked||f.properties.state!=='restricted');status.textContent=locationNote+' · '+counts.paid+' paid · '+counts.inactive+' no scheduled payment'+(counts.unknown?' · '+counts.unknown+' review':'')+(counts.restricted?' · '+counts.restricted+' avoid':'')+(meterLoadWarning?' · Refresh failed':meterDataStale?' · Older meter snapshot':'');
  visibleById=new Map(visible.map(f=>[featureIds.get(f.geometry),f]));
  if(ready)map.getSource('meters').setData({type:'FeatureCollection',features:visible.map(f=>({
   type:'Feature',geometry:f.geometry,properties:{id:featureIds.get(f.geometry),color:f.properties.color}
@@ -92,7 +96,73 @@ let featureIds=new WeakMap(),visibleById=new Map(),nextFeatureId=0;
 arrival.onchange=()=>{live=false;render();};stay.onchange=render;hide.onchange=render;$('now').onclick=()=>{live=true;render();};$('settings').onclick=()=>{$('settings-panel').showModal();};$('done').onclick=()=>{$('settings-panel').close();render();};
 setInterval(()=>{if(live&&arrival.value!==nyNow())render();},15000);
 document.addEventListener('visibilitychange',()=>{if(!document.hidden&&live)render();});
-async function load(){const id=++loadId;status.textContent='Loading official NYC meter inventory…';let features;try{try{const snap=await json('https://raw.githubusercontent.com/chrisgaun/curbnyc/main/data/meters.json?day='+new Date().toISOString().slice(0,10));features=normalize(snap);if(features.length<9000)throw Error('Incomplete local snapshot');}catch{let rows=[];for(let offset=0;offset<30000;offset+=5000){const url=new URL(base+'/resource/e7yp-wx55.json');url.searchParams.set('$limit','5000');url.searchParams.set('$offset',String(offset));url.searchParams.set('$order',':id');const page=await json(url);if(!Array.isArray(page))throw Error('Expected meter records');rows.push(...page);if(page.length<5000)break;if(offset===25000)throw Error('Pagination limit exceeded');}features=normalize(rows);if(features.length<9000)throw Error('Incomplete inventory ('+features.length+' valid lines)');}if(id!==loadId)return;featureIds=new WeakMap(features.map(feature=>[feature.geometry,nextFeatureId++]));compileCache=new WeakMap();assessmentCache=new WeakMap();inventory=indexMeters(features);render();}catch(e){if(id!==loadId)return;status.textContent='Meter load failed: '+e.message+'. Use Reload meter data or the official NYC map.';}}
+const snapshotStatus=$('snapshot-status');
+let meterDataNote='',meterLoadWarning='',meterDataStale=false;
+function showMeterDataNote(){
+ snapshotStatus.textContent=[meterDataNote,meterLoadWarning].filter(Boolean).join(' ');
+}
+function snapshotNote(snapshot){
+ const timestamp=snapshot?.metadata?.fetchedAt;
+ const time=Date.parse(timestamp);
+ if(!Number.isFinite(time)||time>Date.now())return {note:'NYC meter snapshot. Refresh date unavailable.',stale:false};
+ const stale=Date.now()-time>45*24*60*60*1000;
+ const version=String(snapshot.metadata.version??'');
+ const shortId=/^[a-f0-9]{64}$/.test(version)?' · '+version.slice(0,8):'';
+ return {note:'NYC meter snapshot · fetched '+timestamp.slice(0,10)+shortId+'.'+(stale?' This snapshot may be out of date.':''),stale};
+}
+async function load(){
+ const day=new Date().toISOString().slice(0,10);
+ // Bot commits update main without rebuilding branch-published GitHub Pages.
+ const snapshotUrl=['localhost','127.0.0.1','[::1]'].includes(location.hostname)
+  ?'./data/meters.json'
+  :'https://raw.githubusercontent.com/chrisgaun/curbnyc/main/data/meters.json';
+ const id=++loadId;
+ status.textContent='Loading official NYC meter inventory…';
+ try{
+  let features,source;
+  try{
+   const snapshot=await json(snapshotUrl+'?day='+day);
+   features=normalize(snapshot);
+   if(features.length<9000)throw Error('Incomplete meter snapshot');
+   source=snapshotNote(snapshot);
+  }catch{
+   const rows=[];
+   for(let offset=0;offset<30000;offset+=5000){
+    const url=new URL(base+'/resource/e7yp-wx55.json');
+    url.searchParams.set('$limit','5000');
+    url.searchParams.set('$offset',String(offset));
+    url.searchParams.set('$order',':id');
+    const page=await json(url);
+    if(!Array.isArray(page))throw Error('Expected meter records');
+    rows.push(...page);
+    if(page.length<5000)break;
+    if(offset===25000)throw Error('Pagination limit exceeded');
+   }
+   features=normalize(rows);
+   if(features.length<9000)throw Error('Incomplete inventory ('+features.length+' valid lines)');
+   source={note:'NYC Open Data · retrieved '+day+'.',stale:false};
+  }
+  if(id!==loadId)return;
+  featureIds=new WeakMap(features.map(feature=>[feature.geometry,nextFeatureId++]));
+  compileCache=new WeakMap();
+  assessmentCache=new WeakMap();
+  inventory=indexMeters(features);
+  meterDataNote=source.note;
+  meterDataStale=source.stale;
+  meterLoadWarning='';
+  showMeterDataNote();
+  render();
+ }catch(e){
+  if(id!==loadId)return;
+  if(inventory){
+   meterLoadWarning='Refresh failed. Showing the last loaded meter data.';
+   showMeterDataNote();
+   render();
+  }else{
+   status.textContent='Meter load failed: '+e.message+'. Try Reload data or check the official NYC map.';
+  }
+ }
+}
 const basemap=createBasemapLoader({
  getBounds:()=>map.getBounds(),
  fetchGeometry:json,
