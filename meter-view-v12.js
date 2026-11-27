@@ -1,5 +1,6 @@
 import {setupDestinationSearch} from './destination-search.js';
 import {readMapPreferences,saveMapPreferences} from './map-preferences.js';
+import {applyMapTheme,applyPageTheme,mapPaint,resolveTheme} from './map-theme.js';
 import {plannedAspDays} from './asp-calendar.js';
 import {compileMeter} from './meter-schedule-v11.js';
 import {indexMeters} from './meter-spatial.js';
@@ -31,9 +32,20 @@ const nyClock=new Intl.DateTimeFormat('sv-SE',{timeZone:'America/New_York',year:
 function nyNow(){return nyClock.format(new Date()).replace(' ','T');}
 const arrival=$('arrival'),stay=$('stay'),hide=$('hide-restricted'),radiusControl=$('radius');
 const preferences=readMapPreferences();
+const themeControl=$('theme'),systemTheme=window.matchMedia('(prefers-color-scheme: dark)');
+themeControl.value=preferences.theme;
+let theme=resolveTheme(themeControl.value,systemTheme.matches);
+applyPageTheme(document.documentElement,theme);
+function syncTheme(){
+ const next=resolveTheme(themeControl.value,systemTheme.matches);
+ if(next===theme)return;
+ theme=next;
+ applyPageTheme(document.documentElement,theme);
+ if(ready)applyMapTheme(map,theme);
+}
+systemTheme.addEventListener('change',syncTheme);
 radiusControl.value=preferences.radius;
 hide.checked=preferences.hideRestricted;let live=true,gps=null,locationNote='Bryant Park preview',userMoved=false,locRequest=0;arrival.value=nyNow();
-const color={paid:'#2563eb',inactive:'#26965c',restricted:'#cf4444',unknown:'#858b94'};
 const labels={paid:'Passenger parking · meter active',inactive:'No meter payment scheduled',restricted:'Avoid',unknown:'Check signs'};
 function valid(v){return v&&String(v).trim().toUpperCase()!=='N/A';}
 function timeLabel(at){if(!at)return '';const d=new Date(at+'Z');const hh=d.getUTCHours(),mm=d.getUTCMinutes();return (hh%12||12)+(mm?':'+String(mm).padStart(2,'0'):'')+(hh<12?' AM':' PM');}
@@ -57,7 +69,7 @@ function details(p,parent){
  scheduleSection(wrap,'Passenger rates',valid(p.all_vehi_2)?String(p.all_vehi_2).split(/\s+\/\s+/):[]);
  scheduleSection(wrap,'Commercial parking',valid(p.commerci_1)?String(p.commerci_1).split(/,\s*/):[]);
 }
-function card(p,node){el('strong',heading(p),node);const title=el('div',labels[p.state]||'Check signs',node);title.className='curb-state';title.style.color=color[p.state]||color.unknown;
+function card(p,node){el('strong',heading(p),node);const title=el('div',labels[p.state]||'Check signs',node);title.className='curb-state';title.dataset.state=Object.hasOwn(labels,p.state)?p.state:'unknown';
  if(p.state==='paid'){
   const rate=p.firstRate===''||p.firstRate==null?'Meter rate needs review'
    :'$'+Number(p.firstRate).toFixed(2)+(p.rateMinutes===60?' first hour':' per '+p.rateMinutes+' min');
@@ -105,11 +117,11 @@ function render(){syncClock();if(!inventory)return;const radius=Number(radiusCon
  const local=inventory(center,radius);localCount=local.length;const counts={paid:0,inactive:0,restricted:0,unknown:0};
  const assessed=local.map(f=>{const e=assess(f,hours);counts[e.state]++;let nextText='';if(e.next){const t=timeLabel(e.next.at)+(e.next.at.slice(0,10)!==arrival.value.slice(0,10)?' next day':'');if(e.current==='paid'&&e.next.state==='inactive')nextText='Meter payment ends '+t;else if(e.next.state==='restricted')nextText='Commercial restriction starts '+t;else if(e.next.state==='paid')nextText='Meter payment starts '+t;else if(e.next.state==='unknown')nextText='Meter schedule needs review from '+t;else if(e.current==='restricted')nextText='Commercial schedule ends '+t;}
  let plannedText='';if(hours&&['paid','inactive'].includes(e.state)){if(e.cost!=null)plannedText='Estimated meter cost: $'+e.cost.toFixed(2)+' / '+stay.options[stay.selectedIndex].text;else if(e.paidMinutes!=null&&e.paidMinutes<hours*60)plannedText=e.paidMinutes+' min in scheduled paid hours. Check the meter for the charge.';else plannedText='Check the meter for the charge for this stay.';}
- return {...f,properties:{...f.properties,state:e.state,color:color[e.state],reason:e.reason,firstRate:e.firstRate??'',rateMinutes:e.rateMinutes,maxHours:e.maxHours??'',nextText,plannedText}};});
+ return {...f,properties:{...f.properties,state:e.state,reason:e.reason,firstRate:e.firstRate??'',rateMinutes:e.rateMinutes,maxHours:e.maxHours??'',nextText,plannedText}};});
  visible=assessed.filter(f=>!hide.checked||f.properties.state!=='restricted');status.textContent=locationNote+' · '+counts.paid+' paid · '+counts.inactive+' no scheduled payment'+(counts.unknown?' · '+counts.unknown+' review':'')+(counts.restricted?' · '+counts.restricted+' avoid':'')+(meterLoadWarning?' · Refresh failed':meterDataStale?' · Older meter snapshot':'')+(navigator.onLine===false?' · Offline':'');
  visibleById=new Map(visible.map(f=>[featureIds.get(f.geometry),f]));
  if(ready)map.getSource('meters').setData({type:'FeatureCollection',features:visible.map(f=>({
-  type:'Feature',geometry:f.geometry,properties:{id:featureIds.get(f.geometry),color:f.properties.color}
+  type:'Feature',geometry:f.geometry,properties:{id:featureIds.get(f.geometry),state:f.properties.state}
  }))});
  if(nearbyPanel.open)renderList();
 }
@@ -223,11 +235,15 @@ const basemap=createBasemapLoader({
 function move(p,note){center=p;locationNote=note;if(ready)map.jumpTo({center:p,zoom:16});render();}
 function locate(auto=false){const id=++locRequest;if(!navigator.geolocation){locationNote='Location unavailable · Bryant Park preview';render();return;}if(!auto)userMoved=false;locationNote='Finding your location…';render();navigator.geolocation.getCurrentPosition(p=>{if(id!==locRequest)return;gps=[p.coords.longitude,p.coords.latitude];renderFocus();if(!userMoved)move(gps,'Near you');else render();},e=>{if(id!==locRequest)return;locationNote='Location unavailable · browsing map';render();if(!inventory)status.textContent=locationNote;},{timeout:12000,maximumAge:30000,enableHighAccuracy:true});}
 function updateMapPreferences(){
- saveMapPreferences({radius:radiusControl.value,hideRestricted:hide.checked});
+ saveMapPreferences({radius:radiusControl.value,hideRestricted:hide.checked,theme:themeControl.value});
  render();
 }
 radiusControl.onchange=updateMapPreferences;
 hide.onchange=updateMapPreferences;
+themeControl.onchange=()=>{
+ saveMapPreferences({radius:radiusControl.value,hideRestricted:hide.checked,theme:themeControl.value});
+ syncTheme();
+};
 window.addEventListener('online',render);
 window.addEventListener('offline',render);
 setupDestinationSearch({
@@ -240,8 +256,8 @@ setupDestinationSearch({
  }
 });
 $('retry').onclick=load;$('loc').onclick=()=>locate(false);$('bryant').onclick=()=>{userMoved=true;++locRequest;move([...bryant],'Bryant Park');};
-try{const attribution='NYC Open Data';map=new maplibregl.Map({container:'map',center,zoom:16,minZoom:14,maxZoom:19,style:{version:8,glyphs:'https://demotiles.maplibre.org/font/{fontstack}/{range}.pbf',sources:Object.fromEntries(['buildings','parks','streets','meters','focus'].map(n=>[n,{type:'geojson',data:empty(),attribution}])),layers:[
-{id:'background',type:'background',paint:{'background-color':'#eeeee8'}},{id:'parks',type:'fill',source:'parks',paint:{'fill-color':'#c8dbc0'}},{id:'buildings',type:'fill',source:'buildings',paint:{'fill-color':'#d6d7d2','fill-outline-color':'#c7c9c3'}},{id:'road-outline',type:'line',source:'streets',paint:{'line-color':'#d1d3cd','line-width':['interpolate',['linear'],['zoom'],14,5,16,15,19,65]}},{id:'roads',type:'line',source:'streets',paint:{'line-color':'#fff','line-width':['interpolate',['linear'],['zoom'],14,3,16,13,19,63]}},{id:'street-names',type:'symbol',source:'streets',layout:{'symbol-placement':'line','text-field':['coalesce',['get','st_label'],['get','street'],['get','full_stree'],''],'text-font':['Noto Sans Regular'],'text-size':11},paint:{'text-color':'#505a5d','text-halo-color':'#fff','text-halo-width':1}},{id:'meters',type:'line',source:'meters',layout:{'line-cap':'round','line-join':'round'},paint:{'line-color':['coalesce',['get','color'],'#858b94'],'line-width':['interpolate',['linear'],['zoom'],14,3,16,6,19,9]}},{id:'focus',type:'circle',source:'focus',paint:{'circle-radius':7,'circle-color':'#2265bf','circle-stroke-width':2,'circle-stroke-color':'#fff'}}]}});
-map.addControl(new maplibregl.NavigationControl({showCompass:false}),'top-right');map.once('load',()=>{ready=true;map.jumpTo({center});render();renderFocus();basemap();map.on('dragstart',()=>{userMoved=true;});map.on('moveend',()=>{const c=map.getCenter();const moved=Math.hypot(c.lng-center[0],c.lat-center[1])>0.00001;if(moved){center=[c.lng,c.lat];locationNote='Browsing map';render();}basemap();});map.on('click','meters',e=>{const p=visibleById.get(e.features[0].properties.id)?.properties;if(!p)return;const node=document.createElement('div');card(p,node);new maplibregl.Popup({maxWidth:'300px'}).setLngLat(e.lngLat).setDOMContent(node).addTo(map);});});map.on('error',e=>{if(!ready)mapStatus.textContent='Map error: '+(e.error?.message||'Map could not initialize')+'; meter list works independently.';});setTimeout(()=>{if(!ready)mapStatus.textContent='Map not ready. Meter list loads independently.';},12000);
+try{const attribution='NYC Open Data',paint=mapPaint(theme);map=new maplibregl.Map({container:'map',center,zoom:16,minZoom:14,maxZoom:19,style:{version:8,glyphs:'https://demotiles.maplibre.org/font/{fontstack}/{range}.pbf',sources:Object.fromEntries(['buildings','parks','streets','meters','focus'].map(n=>[n,{type:'geojson',data:empty(),attribution}])),layers:[
+{id:'background',type:'background',paint:paint.background},{id:'parks',type:'fill',source:'parks',paint:paint.parks},{id:'buildings',type:'fill',source:'buildings',paint:paint.buildings},{id:'road-outline',type:'line',source:'streets',paint:{...paint['road-outline'],'line-width':['interpolate',['linear'],['zoom'],14,5,16,15,19,65]}},{id:'roads',type:'line',source:'streets',paint:{...paint.roads,'line-width':['interpolate',['linear'],['zoom'],14,3,16,13,19,63]}},{id:'street-names',type:'symbol',source:'streets',layout:{'symbol-placement':'line','text-field':['coalesce',['get','st_label'],['get','street'],['get','full_stree'],''],'text-font':['Noto Sans Regular'],'text-size':11},paint:{...paint['street-names'],'text-halo-width':1}},{id:'meters',type:'line',source:'meters',layout:{'line-cap':'round','line-join':'round'},paint:{...paint.meters,'line-width':['interpolate',['linear'],['zoom'],14,3,16,6,19,9]}},{id:'focus',type:'circle',source:'focus',paint:{...paint.focus,'circle-radius':7,'circle-stroke-width':2}}]}});
+map.addControl(new maplibregl.NavigationControl({showCompass:false}),'top-right');map.once('load',()=>{ready=true;applyMapTheme(map,theme);map.jumpTo({center});render();renderFocus();basemap();map.on('dragstart',()=>{userMoved=true;});map.on('moveend',()=>{const c=map.getCenter();const moved=Math.hypot(c.lng-center[0],c.lat-center[1])>0.00001;if(moved){center=[c.lng,c.lat];locationNote='Browsing map';render();}basemap();});map.on('click','meters',e=>{const p=visibleById.get(e.features[0].properties.id)?.properties;if(!p)return;const node=document.createElement('div');card(p,node);new maplibregl.Popup({maxWidth:'300px'}).setLngLat(e.lngLat).setDOMContent(node).addTo(map);});});map.on('error',e=>{if(!ready)mapStatus.textContent='Map error: '+(e.error?.message||'Map could not initialize')+'; meter list works independently.';});setTimeout(()=>{if(!ready)mapStatus.textContent='Map not ready. Meter list loads independently.';},12000);
 }catch(e){mapStatus.textContent='Map unavailable: '+e.message+'; meter list works independently.';}
 load();locate(true);if('serviceWorker' in navigator)navigator.serviceWorker.register('./sw.js').catch(()=>{});

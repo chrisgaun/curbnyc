@@ -26,13 +26,13 @@ test('results distinguish boroughs and reject invalid or duplicate geometry',()=
 test('only map display options survive reload and invalid settings fall back',()=>{
  let data;
  const storage={getItem:()=>data,setItem:(_key,value)=>{data=value;}};
- assert.deepEqual(readMapPreferences(storage),{radius:'500',hideRestricted:true});
- saveMapPreferences({radius:'800',hideRestricted:false,arrival:'2026-11-26T10:00',destination:'Example'},storage);
- assert.deepEqual(JSON.parse(data),{radius:'800',hideRestricted:false});
- assert.deepEqual(readMapPreferences(storage),{radius:'800',hideRestricted:false});
- data='{"radius":"invalid","hideRestricted":"false"}';
- assert.deepEqual(readMapPreferences(storage),{radius:'500',hideRestricted:true});
+ assert.deepEqual(readMapPreferences(storage),{radius:'500',hideRestricted:true,theme:'system'});
+ saveMapPreferences({radius:'800',hideRestricted:false,theme:'dark',arrival:'2026-11-26T10:00',destination:'Example'},storage);
+ assert.deepEqual(JSON.parse(data),{radius:'800',hideRestricted:false,theme:'dark'});
+ assert.deepEqual(readMapPreferences(storage),{radius:'800',hideRestricted:false,theme:'dark'});
+ data='{"radius":"invalid","hideRestricted":"false","theme":"sepia"}';
+ assert.deepEqual(readMapPreferences(storage),{radius:'500',hideRestricted:true,theme:'system'});
  const blocked={getItem(){throw Error('denied');},setItem(){throw Error('denied');}};
- assert.doesNotThrow(()=>saveMapPreferences({radius:'250',hideRestricted:true},blocked));
- assert.deepEqual(readMapPreferences(blocked),{radius:'500',hideRestricted:true});
+ assert.doesNotThrow(()=>saveMapPreferences({radius:'250',hideRestricted:true,theme:'system'},blocked));
+ assert.deepEqual(readMapPreferences(blocked),{radius:'500',hideRestricted:true,theme:'system'});
 });

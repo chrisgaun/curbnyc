@@ -4,15 +4,21 @@ CurbNYC is a free, open-source NYC parking map. It shows official NYC meter bloc
 
 [Open the map](https://chrisgaun.github.io/curbnyc/)
 
+<img src="docs/images/curbnyc-dark.jpg" alt="CurbNYC in dark mode on a phone-width screen, showing colored meter blockfaces around Bryant Park" width="350">
+
 ## Use the map
 
-Allow location access to start near your position or browse from Bryant Park. Tap a colored curb for its schedule, or use Settings to change arrival time, stay length, and search radius. Expand **Data and nearby meters** for the nearby list.
+- Start near your location or browse from Bryant Park. Use **Search** to find an NYC address or place. The app sends search text to NYC Planning when you submit it.
+- Tap a colored curb for the published meter schedule, rate estimate when available, and commercial restrictions. Use **Settings** to plan a stay, set the search radius, or select System, Light, or Dark.
+- Expand **Data and nearby meters** for the snapshot date, nearby list, and planned street-cleaning suspensions. Check NYC311 for current suspension status, including emergency updates.
 
-Check all posted signs. A curb with no scheduled meter payment can still have other restrictions. The app does not determine vacancy or cover hydrants, alternate-side rules, temporary restrictions, or unmapped curbs.
+Check posted signs and the curb. A blockface with no scheduled meter payment can still have other restrictions. Coverage is limited to official meter records. The app does not show vacancy, validate individual street-cleaning rules, or map hydrant, bus stop, and temporary exclusions. The non-metered sign pilot remains offline.
+
+After one online visit, an offline launch can show a retry screen. Meter schedules and maps still require a connection.
 
 ## Develop locally
 
-Run `python3 -m http.server 8000` from the repository root and open `http://localhost:8000`. Browser geolocation requires HTTPS or localhost. Run `npm test` for the schedule, spatial selection, and background request tests.
+Run `python3 -m http.server 8000` from the repository root and open `http://localhost:8000`. Browser geolocation requires HTTPS or localhost. Run `npm test` for app tests and `python3 -m unittest scripts.test_sign_blockfaces` for the offline sign pilot.
 
 The active entry point is `index.html`. It uses MapLibre GL JS and official NYC Open Data for [meter blockfaces](https://data.cityofnewyork.us/d/e7yp-wx55), [streets](https://data.cityofnewyork.us/d/inkn-q76z), [buildings](https://data.cityofnewyork.us/d/5zhs-2jue), and [parks](https://data.cityofnewyork.us/d/y6ja-fw4f). Background requests include the map viewport. The code is MIT-licensed. Source data and third-party assets have their own terms.
 
@@ -24,9 +30,16 @@ The calculator supports the weekly schedules, split windows, overnight intervals
 
 The regression fixtures preserve five NYC Open Data records, including West 41 Street (104933), Bedford Avenue in Williamsburg (301265), and a 30-minute Jackson Heights meter (466707). These records were compared with the live data API. The published DOT rates provide zone-level corroboration. Field signs can differ and were not independently checked.
 
-The monthly Actions refresh keeps the previous published snapshot if the response is incomplete or validation fails. After the first successful versioned refresh, **Data and nearby meters** shows the source, fetch date, and abbreviated content digest. A fetch date records when CurbNYC retrieved the data. Snapshots older than 45 days show an age warning. A failed refresh of an open map keeps its previous lines visible. The deployed app reads the snapshot directly from GitHub main so a data update can be picked up without a Pages build.
+The monthly Actions refresh keeps the previous published snapshot if the response is incomplete or validation fails. **Data and nearby meters** shows the source, fetch date, and abbreviated content digest. A fetch date records when CurbNYC retrieved the data. Snapshots older than 45 days show an age warning. A failed refresh of an open map keeps its previous lines visible. The deployed app reads the snapshot directly from GitHub main so a data update can be picked up without a Pages build.
 
 On browsers with gzip streaming support, the active map first tries the lossless compact snapshot generated alongside the canonical JSON. The compact format preserves double-precision line coordinates, feature order, and meter schedule strings. If it is unavailable or invalid, the app uses the canonical JSON and then paginated NYC Open Data. The first successful refresh after rollout publishes the compact file. For a local preview, run `python3 scripts/pack_meters.py data/meters.json` before starting the server. The generated file is managed by the refresh workflow; keep the canonical JSON in place for older browsers and the existing meter views.
+
+## Project notes
+
+- [Non-metered sign pilot](docs/non-metered-sign-pilot.md)
+- [Street-cleaning calendar and curb exclusions](docs/asp-and-curb-exclusions.md)
+- [Search and local preferences](docs/mobile-search.md)
+- [Android release preflight](docs/android-preflight.md)
 
 ## Midtown vector tile pilot
 
