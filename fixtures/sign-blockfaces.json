@@ -1,0 +1,1232 @@
+{
+  "midtown": {
+    "signs": [
+      {
+        "borough": "Manhattan",
+        "order_number": "P-01785794",
+        "record_type": "Current",
+        "order_type": "P-",
+        "sign_code": "PS-627C",
+        "sign_description": "3 HMP COMMERCIAL VEHICLES ONLY 10AM-10PM EXCEPT SUNDAY <->",
+        "on_street": "WEST   40 STREET",
+        "from_street": "8 AVENUE",
+        "to_street": "7 AVENUE",
+        "side_of_street": "N",
+        "sign_x_coord": "987551",
+        "sign_y_coord": "214303"
+      },
+      {
+        "borough": "Manhattan",
+        "order_number": "P-01624538",
+        "record_type": "Current",
+        "order_type": "P-",
+        "sign_code": "PS-9A",
+        "sign_description": "PAY-BY-CELL LOCATOR NUMBER",
+        "sign_notes": "106182",
+        "on_street": "WEST   40 STREET",
+        "from_street": "8 AVENUE",
+        "to_street": "7 AVENUE",
+        "side_of_street": "S",
+        "sign_x_coord": "987217",
+        "sign_y_coord": "214451"
+      },
+      {
+        "borough": "Manhattan",
+        "order_number": "S-01294796",
+        "record_type": "Current",
+        "order_type": "S-",
+        "sign_code": "PS-198DA",
+        "sign_description": "STAR (SYMBOL) AVO NYS DOCCS -->",
+        "on_street": "WEST   40 STREET",
+        "from_street": "9 AVENUE",
+        "to_street": "8 AVENUE",
+        "side_of_street": "N",
+        "sign_x_coord": "986537",
+        "sign_y_coord": "214845",
+        "arrow_direction": "West"
+      }
+    ],
+    "lion": {
+      "spatialReference": {
+        "wkid": 102718,
+        "latestWkid": 2263
+      },
+      "features": [
+        {
+          "attributes": {
+            "Street": "8 AVENUE LINE",
+            "SAFStreetName": "                                ",
+            "LBoro": 1,
+            "RBoro": 1,
+            "NodeIDFrom": "0021347",
+            "NodeIDTo": "0021348",
+            "SegCount": "1",
+            "RW_TYPE": "  ",
+            "SegmentID": "8101753",
+            "CurveFlag": " ",
+            "XFrom": 986694,
+            "YFrom": 214464,
+            "XTo": 986819,
+            "YTo": 214690,
+            "LBlockFaceID": "          ",
+            "RBlockFaceID": "          "
+          }
+        },
+        {
+          "attributes": {
+            "Street": "8 AVENUE",
+            "SAFStreetName": "                                ",
+            "LBoro": 1,
+            "RBoro": 1,
+            "NodeIDFrom": "0021347",
+            "NodeIDTo": "0021348",
+            "SegCount": "1",
+            "RW_TYPE": " 1",
+            "SegmentID": "0033827",
+            "CurveFlag": " ",
+            "XFrom": 986694,
+            "YFrom": 214464,
+            "XTo": 986819,
+            "YTo": 214690,
+            "LBlockFaceID": "1222603370",
+            "RBlockFaceID": "1222601535"
+          }
+        },
+        {
+          "attributes": {
+            "Street": "WEST 40 STREET",
+            "SAFStreetName": "7 AVENUE                        ",
+            "LBoro": 1,
+            "RBoro": 1,
+            "NodeIDFrom": "0021406",
+            "NodeIDTo": "0021404",
+            "SegCount": "3",
+            "RW_TYPE": " 1",
+            "SegmentID": "0033946",
+            "CurveFlag": " ",
+            "XFrom": 987889,
+            "YFrom": 214095,
+            "XTo": 987605,
+            "YTo": 214252,
+            "LBlockFaceID": "1222606411",
+            "RBlockFaceID": "1222604632"
+          }
+        },
+        {
+          "attributes": {
+            "Street": "8 AVENUE",
+            "SAFStreetName": "PORT AUTHORITY BUS TERMINAL     ",
+            "LBoro": 1,
+            "RBoro": 1,
+            "NodeIDFrom": "0021348",
+            "NodeIDTo": "0021349",
+            "SegCount": "2",
+            "RW_TYPE": " 1",
+            "SegmentID": "0033828",
+            "CurveFlag": " ",
+            "XFrom": 986819,
+            "YFrom": 214690,
+            "XTo": 986944,
+            "YTo": 214915,
+            "LBlockFaceID": "1222602710",
+            "RBlockFaceID": "1222605770"
+          }
+        },
+        {
+          "attributes": {
+            "Street": "WEST 40 STREET",
+            "SAFStreetName": "                                ",
+            "LBoro": 1,
+            "RBoro": 1,
+            "NodeIDFrom": "0021404",
+            "NodeIDTo": "0021348",
+            "SegCount": "1",
+            "RW_TYPE": " 1",
+            "SegmentID": "0033942",
+            "CurveFlag": " ",
+            "XFrom": 987605,
+            "YFrom": 214252,
+            "XTo": 986819,
+            "YTo": 214690,
+            "LBlockFaceID": "1222605761",
+            "RBlockFaceID": "1222601561"
+          }
+        },
+        {
+          "attributes": {
+            "Street": "WEST 40 STREET",
+            "SAFStreetName": "                                ",
+            "LBoro": 1,
+            "RBoro": 1,
+            "NodeIDFrom": "0021406",
+            "NodeIDTo": "0021404",
+            "SegCount": "3",
+            "RW_TYPE": " 1",
+            "SegmentID": "0033946",
+            "CurveFlag": " ",
+            "XFrom": 987889,
+            "YFrom": 214095,
+            "XTo": 987605,
+            "YTo": 214252,
+            "LBlockFaceID": "1222606411",
+            "RBlockFaceID": "1222604632"
+          }
+        },
+        {
+          "attributes": {
+            "Street": "7 AVENUE",
+            "SAFStreetName": "                                ",
+            "LBoro": 1,
+            "RBoro": 1,
+            "NodeIDFrom": "0021404",
+            "NodeIDTo": "0021405",
+            "SegCount": "2",
+            "RW_TYPE": " 1",
+            "SegmentID": "0033943",
+            "CurveFlag": " ",
+            "XFrom": 987605,
+            "YFrom": 214252,
+            "XTo": 987728,
+            "YTo": 214480,
+            "LBlockFaceID": "1222601562",
+            "RBlockFaceID": "1222606896"
+          }
+        },
+        {
+          "attributes": {
+            "Street": "7 AVENUE",
+            "SAFStreetName": "                                ",
+            "LBoro": 1,
+            "RBoro": 1,
+            "NodeIDFrom": "0021403",
+            "NodeIDTo": "0021404",
+            "SegCount": "2",
+            "RW_TYPE": " 1",
+            "SegmentID": "0033941",
+            "CurveFlag": " ",
+            "XFrom": 987482,
+            "YFrom": 214027,
+            "XTo": 987605,
+            "YTo": 214252,
+            "LBlockFaceID": "1222601537",
+            "RBlockFaceID": "1222607285"
+          }
+        },
+        {
+          "attributes": {
+            "Street": "7 AVENUE",
+            "SAFStreetName": "TIMES SQUARE                    ",
+            "LBoro": 1,
+            "RBoro": 1,
+            "NodeIDFrom": "0021404",
+            "NodeIDTo": "0021405",
+            "SegCount": "2",
+            "RW_TYPE": " 1",
+            "SegmentID": "0033943",
+            "CurveFlag": " ",
+            "XFrom": 987605,
+            "YFrom": 214252,
+            "XTo": 987728,
+            "YTo": 214480,
+            "LBlockFaceID": "1222601562",
+            "RBlockFaceID": "1222606896"
+          }
+        },
+        {
+          "attributes": {
+            "Street": "8 AVENUE",
+            "SAFStreetName": "                                ",
+            "LBoro": 1,
+            "RBoro": 1,
+            "NodeIDFrom": "0021348",
+            "NodeIDTo": "0021349",
+            "SegCount": "2",
+            "RW_TYPE": " 1",
+            "SegmentID": "0033828",
+            "CurveFlag": " ",
+            "XFrom": 986819,
+            "YFrom": 214690,
+            "XTo": 986944,
+            "YTo": 214915,
+            "LBlockFaceID": "1222602710",
+            "RBlockFaceID": "1222605770"
+          }
+        },
+        {
+          "attributes": {
+            "Street": "IRT-1-BROADWAY/ 7 AVENUE LINE",
+            "SAFStreetName": "                                ",
+            "LBoro": 1,
+            "RBoro": 1,
+            "NodeIDFrom": "0021403",
+            "NodeIDTo": "0021404",
+            "SegCount": "1",
+            "RW_TYPE": "  ",
+            "SegmentID": "8102053",
+            "CurveFlag": " ",
+            "XFrom": 987482,
+            "YFrom": 214027,
+            "XTo": 987605,
+            "YTo": 214252,
+            "LBlockFaceID": "          ",
+            "RBlockFaceID": "          "
+          }
+        },
+        {
+          "attributes": {
+            "Street": "WEST 40 STREET",
+            "SAFStreetName": "                                ",
+            "LBoro": 1,
+            "RBoro": 1,
+            "NodeIDFrom": "0021348",
+            "NodeIDTo": "0021350",
+            "SegCount": "1",
+            "RW_TYPE": " 1",
+            "SegmentID": "0033829",
+            "CurveFlag": " ",
+            "XFrom": 986819,
+            "YFrom": 214690,
+            "XTo": 986034,
+            "YTo": 215125,
+            "LBlockFaceID": "1222606248",
+            "RBlockFaceID": "1222602709"
+          }
+        },
+        {
+          "attributes": {
+            "Street": "IRT-1-BROADWAY/ 7 AVENUE LINE",
+            "SAFStreetName": "                                ",
+            "LBoro": 1,
+            "RBoro": 1,
+            "NodeIDFrom": "0021404",
+            "NodeIDTo": "0021405",
+            "SegCount": "1",
+            "RW_TYPE": "  ",
+            "SegmentID": "8103460",
+            "CurveFlag": " ",
+            "XFrom": 987605,
+            "YFrom": 214252,
+            "XTo": 987728,
+            "YTo": 214480,
+            "LBlockFaceID": "          ",
+            "RBlockFaceID": "          "
+          }
+        },
+        {
+          "attributes": {
+            "Street": "7 AVENUE",
+            "SAFStreetName": "7 AVENUE                        ",
+            "LBoro": 1,
+            "RBoro": 1,
+            "NodeIDFrom": "0021403",
+            "NodeIDTo": "0021404",
+            "SegCount": "2",
+            "RW_TYPE": " 1",
+            "SegmentID": "0033941",
+            "CurveFlag": " ",
+            "XFrom": 987482,
+            "YFrom": 214027,
+            "XTo": 987605,
+            "YTo": 214252,
+            "LBlockFaceID": "1222601537",
+            "RBlockFaceID": "1222607285"
+          }
+        },
+        {
+          "attributes": {
+            "Street": "WEST 40 STREET",
+            "SAFStreetName": "BROADWAY                        ",
+            "LBoro": 1,
+            "RBoro": 1,
+            "NodeIDFrom": "0021406",
+            "NodeIDTo": "0021404",
+            "SegCount": "3",
+            "RW_TYPE": " 1",
+            "SegmentID": "0033946",
+            "CurveFlag": " ",
+            "XFrom": 987889,
+            "YFrom": 214095,
+            "XTo": 987605,
+            "YTo": 214252,
+            "LBlockFaceID": "1222606411",
+            "RBlockFaceID": "1222604632"
+          }
+        },
+        {
+          "attributes": {
+            "Street": "8 AVENUE LINE",
+            "SAFStreetName": "                                ",
+            "LBoro": 1,
+            "RBoro": 1,
+            "NodeIDFrom": "0021348",
+            "NodeIDTo": "0021349",
+            "SegCount": "1",
+            "RW_TYPE": "  ",
+            "SegmentID": "8101166",
+            "CurveFlag": " ",
+            "XFrom": 986819,
+            "YFrom": 214690,
+            "XTo": 986944,
+            "YTo": 214915,
+            "LBlockFaceID": "          ",
+            "RBlockFaceID": "          "
+          }
+        }
+      ]
+    },
+    "expected": [
+      {
+        "order": "P-01785794",
+        "status": "candidate",
+        "segmentId": "0033942",
+        "blockfaceId": "1222601561"
+      },
+      {
+        "order": "P-01624538",
+        "status": "candidate",
+        "segmentId": "0033942",
+        "blockfaceId": "1222605761"
+      },
+      {
+        "order": "S-01294796",
+        "status": "unmatched",
+        "segmentId": null,
+        "blockfaceId": null
+      }
+    ]
+  },
+  "williamsburg": {
+    "signs": [
+      {
+        "borough": "Brooklyn",
+        "order_number": "S-367285",
+        "record_type": "Current",
+        "order_type": "S-",
+        "sign_code": "PS-113B",
+        "sign_description": "NO PARKING (SANITATION BROOM SYMBOL) MONDAY THURSDAY 9AM-10:30AM <-> (SUPERSEDES SP-413C)",
+        "on_street": "NORTH    7 STREET",
+        "from_street": "BERRY STREET",
+        "to_street": "BEDFORD AVENUE",
+        "side_of_street": "N",
+        "sign_x_coord": "995853",
+        "sign_y_coord": "200923"
+      },
+      {
+        "borough": "Brooklyn",
+        "order_number": "S-367108",
+        "record_type": "Current",
+        "order_type": "S-",
+        "sign_code": "PS-68B",
+        "sign_description": "NO PARKING (SANITATION BROOM SYMBOL) TUESDAY FRIDAY 9AM-10:30AM <-> (SUPERSEDES SP-415C)",
+        "on_street": "NORTH    7 STREET",
+        "from_street": "KENT AVENUE",
+        "to_street": "WYTHE AVENUE",
+        "side_of_street": "S",
+        "sign_x_coord": "994892",
+        "sign_y_coord": "201666"
+      },
+      {
+        "borough": "Brooklyn",
+        "order_number": "S-383448",
+        "record_type": "Current",
+        "order_type": "S-",
+        "sign_code": "PS-10B",
+        "sign_description": "NO PARKING (SANITATION BROOM SYMBOL) TUESDAY FRIDAY 8AM-9:30AM <-> (SUPERSEDES SP-844C)",
+        "on_street": "BEDFORD AVENUE",
+        "from_street": "NORTH    8 STREET",
+        "to_street": "NORTH    9 STREET",
+        "side_of_street": "E",
+        "sign_x_coord": "996196",
+        "sign_y_coord": "201060"
+      },
+      {
+        "borough": "Brooklyn",
+        "order_number": "S-399214",
+        "record_type": "Current",
+        "order_type": "S-",
+        "sign_code": "PS-54B",
+        "sign_description": "NO PARKING (SANITATION BROOM SYMBOL) MONDAY THURSDAY 8AM-9:30AM <-> (SUPERSEDES SP-412C)",
+        "on_street": "BEDFORD AVENUE",
+        "from_street": "GRAND STREET",
+        "to_street": "NORTH    1 STREET",
+        "side_of_street": "W",
+        "sign_x_coord": "994999",
+        "sign_y_coord": "199641"
+      },
+      {
+        "borough": "Brooklyn",
+        "order_number": "S-01387085",
+        "record_type": "Current",
+        "order_type": "S-",
+        "sign_code": "PS-31G",
+        "sign_description": "NO STANDING SCHOOL DAYS 7AM-4PM <-> (SUPERSEDES SP-279C)",
+        "on_street": "NORTH    7 STREET",
+        "from_street": "ROEBLING STREET",
+        "to_street": "HAVEMEYER STREET",
+        "side_of_street": "S",
+        "sign_x_coord": "996703",
+        "sign_y_coord": "200204"
+      }
+    ],
+    "lion": {
+      "spatialReference": {
+        "wkid": 102718,
+        "latestWkid": 2263
+      },
+      "features": [
+        {
+          "attributes": {
+            "Street": "NORTH 7 STREET",
+            "SAFStreetName": "                                ",
+            "LBoro": 3,
+            "RBoro": 3,
+            "NodeIDFrom": "0022029",
+            "NodeIDTo": "0022023",
+            "SegCount": "1",
+            "RW_TYPE": " 1",
+            "SegmentID": "0034959",
+            "CurveFlag": " ",
+            "XFrom": 995613,
+            "YFrom": 201098,
+            "XTo": 995969,
+            "YTo": 200806,
+            "LBlockFaceID": "1922602776",
+            "RBlockFaceID": "1922605829"
+          }
+        },
+        {
+          "attributes": {
+            "Street": "NORTH 7 STREET",
+            "SAFStreetName": "                                ",
+            "LBoro": 3,
+            "RBoro": 3,
+            "NodeIDFrom": "0076527",
+            "NodeIDTo": "0022029",
+            "SegCount": "1",
+            "RW_TYPE": " 1",
+            "SegmentID": "0127599",
+            "CurveFlag": " ",
+            "XFrom": 995385,
+            "YFrom": 201284,
+            "XTo": 995613,
+            "YTo": 201098,
+            "LBlockFaceID": "1922614199",
+            "RBlockFaceID": "1922608271"
+          }
+        },
+        {
+          "attributes": {
+            "Street": "WYTHE AVENUE",
+            "SAFStreetName": "                                ",
+            "LBoro": 3,
+            "RBoro": 3,
+            "NodeIDFrom": "0022026",
+            "NodeIDTo": "0022024",
+            "SegCount": "1",
+            "RW_TYPE": " 1",
+            "SegmentID": "0034952",
+            "CurveFlag": " ",
+            "XFrom": 995218,
+            "YFrom": 201420,
+            "XTo": 995053,
+            "YTo": 201218,
+            "LBlockFaceID": "1922608272",
+            "RBlockFaceID": "1922605183"
+          }
+        },
+        {
+          "attributes": {
+            "Street": "NORTH 8 STREET",
+            "SAFStreetName": "                                ",
+            "LBoro": 3,
+            "RBoro": 3,
+            "NodeIDFrom": "0022098",
+            "NodeIDTo": "0022093",
+            "SegCount": "1",
+            "RW_TYPE": " 1",
+            "SegmentID": "0035079",
+            "CurveFlag": " ",
+            "XFrom": 996133,
+            "YFrom": 201007,
+            "XTo": 996490,
+            "YTo": 200716,
+            "LBlockFaceID": "1922607282",
+            "RBlockFaceID": "1922612747"
+          }
+        },
+        {
+          "attributes": {
+            "Street": "BERRY STREET",
+            "SAFStreetName": "                                ",
+            "LBoro": 3,
+            "RBoro": 3,
+            "NodeIDFrom": "0022030",
+            "NodeIDTo": "0022029",
+            "SegCount": "1",
+            "RW_TYPE": " 1",
+            "SegmentID": "0034960",
+            "CurveFlag": " ",
+            "XFrom": 995777,
+            "YFrom": 201299,
+            "XTo": 995613,
+            "YTo": 201098,
+            "LBlockFaceID": "1922612040",
+            "RBlockFaceID": "1922610448"
+          }
+        },
+        {
+          "attributes": {
+            "Street": "KENT AVENUE",
+            "SAFStreetName": "                                ",
+            "LBoro": 3,
+            "RBoro": 3,
+            "NodeIDFrom": "0021994",
+            "NodeIDTo": "0021991",
+            "SegCount": "1",
+            "RW_TYPE": " 1",
+            "SegmentID": "0034896",
+            "CurveFlag": " ",
+            "XFrom": 994861,
+            "YFrom": 201711,
+            "XTo": 994697,
+            "YTo": 201510,
+            "LBlockFaceID": "1922605181",
+            "RBlockFaceID": "1922602364"
+          }
+        },
+        {
+          "attributes": {
+            "Street": "GRAND STREET",
+            "SAFStreetName": "                                ",
+            "LBoro": 3,
+            "RBoro": 3,
+            "NodeIDFrom": "0019537",
+            "NodeIDTo": "0019624",
+            "SegCount": "1",
+            "RW_TYPE": " 1",
+            "SegmentID": "0030629",
+            "CurveFlag": " ",
+            "XFrom": 994982,
+            "YFrom": 199591,
+            "XTo": 995395,
+            "YTo": 199367,
+            "LBlockFaceID": "1922603255",
+            "RBlockFaceID": "1922612490"
+          }
+        },
+        {
+          "attributes": {
+            "Street": "BEDFORD AVENUE",
+            "SAFStreetName": "                                ",
+            "LBoro": 3,
+            "RBoro": 3,
+            "NodeIDFrom": "0022102",
+            "NodeIDTo": "0022100",
+            "SegCount": "1",
+            "RW_TYPE": " 1",
+            "SegmentID": "0035086",
+            "CurveFlag": " ",
+            "XFrom": 996463,
+            "YFrom": 201410,
+            "XTo": 996298,
+            "YTo": 201209,
+            "LBlockFaceID": "1922611161",
+            "RBlockFaceID": "1922605045"
+          }
+        },
+        {
+          "attributes": {
+            "Street": "NORTH 7 STREET",
+            "SAFStreetName": "                                ",
+            "LBoro": 3,
+            "RBoro": 3,
+            "NodeIDFrom": "0021993",
+            "NodeIDTo": "0021994",
+            "SegCount": "1",
+            "RW_TYPE": " 1",
+            "SegmentID": "0034895",
+            "CurveFlag": " ",
+            "XFrom": 994635,
+            "YFrom": 201903,
+            "XTo": 994861,
+            "YTo": 201711,
+            "LBlockFaceID": "1922615683",
+            "RBlockFaceID": "1922602363"
+          }
+        },
+        {
+          "attributes": {
+            "Street": "NORTH 7 STREET",
+            "SAFStreetName": "                                ",
+            "LBoro": 3,
+            "RBoro": 3,
+            "NodeIDFrom": "0021994",
+            "NodeIDTo": "0022026",
+            "SegCount": "1",
+            "RW_TYPE": " 1",
+            "SegmentID": "0034897",
+            "CurveFlag": " ",
+            "XFrom": 994861,
+            "YFrom": 201711,
+            "XTo": 995218,
+            "YTo": 201420,
+            "LBlockFaceID": "1922608449",
+            "RBlockFaceID": "1922605182"
+          }
+        },
+        {
+          "attributes": {
+            "Street": "GRAND STREET",
+            "SAFStreetName": "                                ",
+            "LBoro": 3,
+            "RBoro": 3,
+            "NodeIDFrom": "0019533",
+            "NodeIDTo": "0019537",
+            "SegCount": "1",
+            "RW_TYPE": " 1",
+            "SegmentID": "0030621",
+            "CurveFlag": " ",
+            "XFrom": 994569,
+            "YFrom": 199811,
+            "XTo": 994982,
+            "YTo": 199591,
+            "LBlockFaceID": "1922602940",
+            "RBlockFaceID": "1922613397"
+          }
+        },
+        {
+          "attributes": {
+            "Street": "BEDFORD AVENUE",
+            "SAFStreetName": "METROPOLITAN RECREATION CENTER  ",
+            "LBoro": 3,
+            "RBoro": 3,
+            "NodeIDFrom": "0019623",
+            "NodeIDTo": "0019621",
+            "SegCount": "2",
+            "RW_TYPE": " 1",
+            "SegmentID": "0030790",
+            "CurveFlag": " ",
+            "XFrom": 995218,
+            "YFrom": 199884,
+            "XTo": 995095,
+            "YTo": 199733,
+            "LBlockFaceID": "1922606160",
+            "RBlockFaceID": "1922614972"
+          }
+        },
+        {
+          "attributes": {
+            "Street": "NORTH 1 STREET",
+            "SAFStreetName": "                                ",
+            "LBoro": 3,
+            "RBoro": 3,
+            "NodeIDFrom": "0019535",
+            "NodeIDTo": "0019621",
+            "SegCount": "1",
+            "RW_TYPE": " 1",
+            "SegmentID": "0030625",
+            "CurveFlag": " ",
+            "XFrom": 994704,
+            "YFrom": 199984,
+            "XTo": 995095,
+            "YTo": 199733,
+            "LBlockFaceID": "1922607970",
+            "RBlockFaceID": "1922602938"
+          }
+        },
+        {
+          "attributes": {
+            "Street": "BEDFORD AVENUE",
+            "SAFStreetName": "                                ",
+            "LBoro": 3,
+            "RBoro": 3,
+            "NodeIDFrom": "0019537",
+            "NodeIDTo": "0019536",
+            "SegCount": "1",
+            "RW_TYPE": " 1",
+            "SegmentID": "0030628",
+            "CurveFlag": " ",
+            "XFrom": 994982,
+            "YFrom": 199591,
+            "XTo": 994873,
+            "YTo": 199372,
+            "LBlockFaceID": "1922604390",
+            "RBlockFaceID": "1922607637"
+          }
+        },
+        {
+          "attributes": {
+            "Street": "KENT AVENUE",
+            "SAFStreetName": "                                ",
+            "LBoro": 3,
+            "RBoro": 3,
+            "NodeIDFrom": "0022025",
+            "NodeIDTo": "0021994",
+            "SegCount": "1",
+            "RW_TYPE": " 1",
+            "SegmentID": "0034950",
+            "CurveFlag": " ",
+            "XFrom": 995025,
+            "YFrom": 201912,
+            "XTo": 994861,
+            "YTo": 201711,
+            "LBlockFaceID": "1922613629",
+            "RBlockFaceID": "1922601623"
+          }
+        },
+        {
+          "attributes": {
+            "Street": "14 STREET/CANARSIE LINE",
+            "SAFStreetName": "                                ",
+            "LBoro": 3,
+            "RBoro": 3,
+            "NodeIDFrom": "0021994",
+            "NodeIDTo": "0022026",
+            "SegCount": "1",
+            "RW_TYPE": "  ",
+            "SegmentID": "8102060",
+            "CurveFlag": " ",
+            "XFrom": 994861,
+            "YFrom": 201711,
+            "XTo": 995218,
+            "YTo": 201420,
+            "LBlockFaceID": "          ",
+            "RBlockFaceID": "          "
+          }
+        },
+        {
+          "attributes": {
+            "Street": "14 STREET/CANARSIE LINE",
+            "SAFStreetName": "                                ",
+            "LBoro": 3,
+            "RBoro": 3,
+            "NodeIDFrom": "0076527",
+            "NodeIDTo": "0022029",
+            "SegCount": "1",
+            "RW_TYPE": "  ",
+            "SegmentID": "8101991",
+            "CurveFlag": " ",
+            "XFrom": 995385,
+            "YFrom": 201284,
+            "XTo": 995613,
+            "YTo": 201098,
+            "LBlockFaceID": "          ",
+            "RBlockFaceID": "          "
+          }
+        },
+        {
+          "attributes": {
+            "Street": "NORTH 9 STREET",
+            "SAFStreetName": "                                ",
+            "LBoro": 3,
+            "RBoro": 3,
+            "NodeIDFrom": "0022100",
+            "NodeIDTo": "0022096",
+            "SegCount": "2",
+            "RW_TYPE": " 1",
+            "SegmentID": "0035082",
+            "CurveFlag": " ",
+            "XFrom": 996298,
+            "YFrom": 201209,
+            "XTo": 996655,
+            "YTo": 200918,
+            "LBlockFaceID": "1922611158",
+            "RBlockFaceID": "1922607280"
+          }
+        },
+        {
+          "attributes": {
+            "Street": "WYTHE AVENUE",
+            "SAFStreetName": "                                ",
+            "LBoro": 3,
+            "RBoro": 3,
+            "NodeIDFrom": "0022027",
+            "NodeIDTo": "0022026",
+            "SegCount": "1",
+            "RW_TYPE": " 1",
+            "SegmentID": "0034954",
+            "CurveFlag": " ",
+            "XFrom": 995382,
+            "YFrom": 201622,
+            "XTo": 995218,
+            "YTo": 201420,
+            "LBlockFaceID": "1922610450",
+            "RBlockFaceID": "1922608448"
+          }
+        },
+        {
+          "attributes": {
+            "Street": "NORTH 9 STREET",
+            "SAFStreetName": "                                ",
+            "LBoro": 3,
+            "RBoro": 3,
+            "NodeIDFrom": "0022031",
+            "NodeIDTo": "0022100",
+            "SegCount": "1",
+            "RW_TYPE": " 1",
+            "SegmentID": "0034963",
+            "CurveFlag": " ",
+            "XFrom": 995942,
+            "YFrom": 201500,
+            "XTo": 996298,
+            "YTo": 201209,
+            "LBlockFaceID": "1922612671",
+            "RBlockFaceID": "1922612835"
+          }
+        },
+        {
+          "attributes": {
+            "Street": "NORTH 7 STREET",
+            "SAFStreetName": "                                ",
+            "LBoro": 3,
+            "RBoro": 3,
+            "NodeIDFrom": "0022026",
+            "NodeIDTo": "0076527",
+            "SegCount": "1",
+            "RW_TYPE": " 1",
+            "SegmentID": "0127598",
+            "CurveFlag": " ",
+            "XFrom": 995218,
+            "YFrom": 201420,
+            "XTo": 995385,
+            "YTo": 201284,
+            "LBlockFaceID": "1922614199",
+            "RBlockFaceID": "1922608271"
+          }
+        },
+        {
+          "attributes": {
+            "Street": "BEDFORD AVENUE",
+            "SAFStreetName": "                                ",
+            "LBoro": 3,
+            "RBoro": 3,
+            "NodeIDFrom": "0019621",
+            "NodeIDTo": "0019537",
+            "SegCount": "1",
+            "RW_TYPE": " 1",
+            "SegmentID": "0030786",
+            "CurveFlag": " ",
+            "XFrom": 995095,
+            "YFrom": 199733,
+            "XTo": 994982,
+            "YTo": 199591,
+            "LBlockFaceID": "1922603254",
+            "RBlockFaceID": "1922602939"
+          }
+        },
+        {
+          "attributes": {
+            "Street": "NORTH 7 STREET",
+            "SAFStreetName": "                                ",
+            "LBoro": 3,
+            "RBoro": 3,
+            "NodeIDFrom": "0022023",
+            "NodeIDTo": "0022092",
+            "SegCount": "2",
+            "RW_TYPE": " 1",
+            "SegmentID": "0034947",
+            "CurveFlag": " ",
+            "XFrom": 995969,
+            "YFrom": 200806,
+            "XTo": 996326,
+            "YTo": 200514,
+            "LBlockFaceID": "1922605360",
+            "RBlockFaceID": "1922607779"
+          }
+        },
+        {
+          "attributes": {
+            "Street": "NORTH 9 STREET",
+            "SAFStreetName": "DRIGGS AVENUE                   ",
+            "LBoro": 3,
+            "RBoro": 3,
+            "NodeIDFrom": "0022100",
+            "NodeIDTo": "0022096",
+            "SegCount": "2",
+            "RW_TYPE": " 1",
+            "SegmentID": "0035082",
+            "CurveFlag": " ",
+            "XFrom": 996298,
+            "YFrom": 201209,
+            "XTo": 996655,
+            "YTo": 200918,
+            "LBlockFaceID": "1922611158",
+            "RBlockFaceID": "1922607280"
+          }
+        },
+        {
+          "attributes": {
+            "Street": "BEDFORD AVENUE",
+            "SAFStreetName": "                                ",
+            "LBoro": 3,
+            "RBoro": 3,
+            "NodeIDFrom": "0022023",
+            "NodeIDTo": "0022021",
+            "SegCount": "1",
+            "RW_TYPE": " 1",
+            "SegmentID": "0034946",
+            "CurveFlag": " ",
+            "XFrom": 995969,
+            "YFrom": 200806,
+            "XTo": 995804,
+            "YTo": 200604,
+            "LBlockFaceID": "1922607780",
+            "RBlockFaceID": "1922605828"
+          }
+        },
+        {
+          "attributes": {
+            "Street": "BEDFORD AVENUE",
+            "SAFStreetName": "                                ",
+            "LBoro": 3,
+            "RBoro": 3,
+            "NodeIDFrom": "0019623",
+            "NodeIDTo": "0019621",
+            "SegCount": "2",
+            "RW_TYPE": " 1",
+            "SegmentID": "0030790",
+            "CurveFlag": " ",
+            "XFrom": 995218,
+            "YFrom": 199884,
+            "XTo": 995095,
+            "YTo": 199733,
+            "LBlockFaceID": "1922606160",
+            "RBlockFaceID": "1922614972"
+          }
+        },
+        {
+          "attributes": {
+            "Street": "NORTH 1 STREET",
+            "SAFStreetName": "                                ",
+            "LBoro": 3,
+            "RBoro": 3,
+            "NodeIDFrom": "0019621",
+            "NodeIDTo": "0019626",
+            "SegCount": "1",
+            "RW_TYPE": " 1",
+            "SegmentID": "0030787",
+            "CurveFlag": " ",
+            "XFrom": 995095,
+            "YFrom": 199733,
+            "XTo": 995481,
+            "YTo": 199479,
+            "LBlockFaceID": "1922606161",
+            "RBlockFaceID": "1922612157"
+          }
+        },
+        {
+          "attributes": {
+            "Street": "14 STREET/CANARSIE LINE",
+            "SAFStreetName": "                                ",
+            "LBoro": 3,
+            "RBoro": 3,
+            "NodeIDFrom": "0022026",
+            "NodeIDTo": "0076527",
+            "SegCount": "1",
+            "RW_TYPE": "  ",
+            "SegmentID": "8100559",
+            "CurveFlag": " ",
+            "XFrom": 995218,
+            "YFrom": 201420,
+            "XTo": 995385,
+            "YTo": 201284,
+            "LBlockFaceID": "          ",
+            "RBlockFaceID": "          "
+          }
+        },
+        {
+          "attributes": {
+            "Street": "14 STREET/CANARSIE LINE",
+            "SAFStreetName": "                                ",
+            "LBoro": 3,
+            "RBoro": 3,
+            "NodeIDFrom": "0022023",
+            "NodeIDTo": "0022092",
+            "SegCount": "1",
+            "RW_TYPE": "  ",
+            "SegmentID": "8102726",
+            "CurveFlag": " ",
+            "XFrom": 995969,
+            "YFrom": 200806,
+            "XTo": 996326,
+            "YTo": 200514,
+            "LBlockFaceID": "          ",
+            "RBlockFaceID": "          "
+          }
+        },
+        {
+          "attributes": {
+            "Street": "BEDFORD AVENUE",
+            "SAFStreetName": "                                ",
+            "LBoro": 3,
+            "RBoro": 3,
+            "NodeIDFrom": "0022098",
+            "NodeIDTo": "0022023",
+            "SegCount": "1",
+            "RW_TYPE": " 1",
+            "SegmentID": "0035078",
+            "CurveFlag": " ",
+            "XFrom": 996133,
+            "YFrom": 201007,
+            "XTo": 995969,
+            "YTo": 200806,
+            "LBlockFaceID": "1922605359",
+            "RBlockFaceID": "1922602775"
+          }
+        },
+        {
+          "attributes": {
+            "Street": "14 STREET/CANARSIE LINE",
+            "SAFStreetName": "                                ",
+            "LBoro": 3,
+            "RBoro": 3,
+            "NodeIDFrom": "0022029",
+            "NodeIDTo": "0022023",
+            "SegCount": "1",
+            "RW_TYPE": "  ",
+            "SegmentID": "8101516",
+            "CurveFlag": " ",
+            "XFrom": 995613,
+            "YFrom": 201098,
+            "XTo": 995969,
+            "YTo": 200806,
+            "LBlockFaceID": "          ",
+            "RBlockFaceID": "          "
+          }
+        },
+        {
+          "attributes": {
+            "Street": "NORTH 7 STREET",
+            "SAFStreetName": "DRIGGS AVENUE                   ",
+            "LBoro": 3,
+            "RBoro": 3,
+            "NodeIDFrom": "0022023",
+            "NodeIDTo": "0022092",
+            "SegCount": "2",
+            "RW_TYPE": " 1",
+            "SegmentID": "0034947",
+            "CurveFlag": " ",
+            "XFrom": 995969,
+            "YFrom": 200806,
+            "XTo": 996326,
+            "YTo": 200514,
+            "LBlockFaceID": "1922605360",
+            "RBlockFaceID": "1922607779"
+          }
+        },
+        {
+          "attributes": {
+            "Street": "BEDFORD AVENUE",
+            "SAFStreetName": "                                ",
+            "LBoro": 3,
+            "RBoro": 3,
+            "NodeIDFrom": "0022100",
+            "NodeIDTo": "0022098",
+            "SegCount": "1",
+            "RW_TYPE": " 1",
+            "SegmentID": "0035083",
+            "CurveFlag": " ",
+            "XFrom": 996298,
+            "YFrom": 201209,
+            "XTo": 996133,
+            "YTo": 201007,
+            "LBlockFaceID": "1922607281",
+            "RBlockFaceID": "1922605683"
+          }
+        },
+        {
+          "attributes": {
+            "Street": "NORTH 8 STREET",
+            "SAFStreetName": "                                ",
+            "LBoro": 3,
+            "RBoro": 3,
+            "NodeIDFrom": "0022030",
+            "NodeIDTo": "0022098",
+            "SegCount": "1",
+            "RW_TYPE": " 1",
+            "SegmentID": "0034961",
+            "CurveFlag": " ",
+            "XFrom": 995777,
+            "YFrom": 201299,
+            "XTo": 996133,
+            "YTo": 201007,
+            "LBlockFaceID": "1922605682",
+            "RBlockFaceID": "1922602774"
+          }
+        },
+        {
+          "attributes": {
+            "Street": "BERRY STREET",
+            "SAFStreetName": "                                ",
+            "LBoro": 3,
+            "RBoro": 3,
+            "NodeIDFrom": "0022029",
+            "NodeIDTo": "0022019",
+            "SegCount": "1",
+            "RW_TYPE": " 1",
+            "SegmentID": "0034958",
+            "CurveFlag": " ",
+            "XFrom": 995613,
+            "YFrom": 201098,
+            "XTo": 995447,
+            "YTo": 200895,
+            "LBlockFaceID": "1922612876",
+            "RBlockFaceID": "1922608270"
+          }
+        },
+        {
+          "attributes": {
+            "Street": "14 STREET/CANARSIE LINE",
+            "SAFStreetName": "                                ",
+            "LBoro": 3,
+            "RBoro": 3,
+            "NodeIDFrom": "0021993",
+            "NodeIDTo": "0021994",
+            "SegCount": "1",
+            "RW_TYPE": "  ",
+            "SegmentID": "8102566",
+            "CurveFlag": " ",
+            "XFrom": 994635,
+            "YFrom": 201903,
+            "XTo": 994861,
+            "YTo": 201711,
+            "LBlockFaceID": "          ",
+            "RBlockFaceID": "          "
+          }
+        }
+      ]
+    },
+    "expected": [
+      {
+        "order": "S-367285",
+        "status": "candidate",
+        "segmentId": "0034959",
+        "blockfaceId": "1922602776"
+      },
+      {
+        "order": "S-367108",
+        "status": "candidate",
+        "segmentId": "0034897",
+        "blockfaceId": "1922605182"
+      },
+      {
+        "order": "S-383448",
+        "status": "candidate",
+        "segmentId": "0035083",
+        "blockfaceId": "1922607281"
+      },
+      {
+        "order": "S-399214",
+        "status": "candidate",
+        "segmentId": "0030786",
+        "blockfaceId": "1922602939"
+      },
+      {
+        "order": "S-01387085",
+        "status": "unmatched",
+        "segmentId": null,
+        "blockfaceId": null
+      }
+    ]
+  }
+}
