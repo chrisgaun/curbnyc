@@ -26,6 +26,8 @@ The regression fixtures preserve five NYC Open Data records, including West 41 S
 
 The monthly Actions refresh keeps the previous published snapshot if the response is incomplete or validation fails. After the first successful versioned refresh, **Data and nearby meters** shows the source, fetch date, and abbreviated content digest. A fetch date records when CurbNYC retrieved the data. Snapshots older than 45 days show an age warning. A failed refresh of an open map keeps its previous lines visible. The deployed app reads the snapshot directly from GitHub main so a data update can be picked up without a Pages build.
 
+On browsers with gzip streaming support, the active map first tries the lossless compact snapshot generated alongside the canonical JSON. The compact format preserves double-precision line coordinates, feature order, and meter schedule strings. If it is unavailable or invalid, the app uses the canonical JSON and then paginated NYC Open Data. The first successful refresh after rollout publishes the compact file. For a local preview, run `python3 scripts/pack_meters.py data/meters.json` before starting the server. The generated file is managed by the refresh workflow; keep the canonical JSON in place for older browsers and the existing meter views.
+
 ## Midtown vector tile pilot
 
 `scripts/prototype_basemap_tiles.cjs` generates static XYZ Mapbox Vector Tiles for zooms 14–16 around Bryant Park and Times Square. Use Node.js 22.12+ and install the pilot tools outside the checkout:

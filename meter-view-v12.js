@@ -4,13 +4,14 @@ import {plannedAspDays} from './asp-calendar.js';
 import {compileMeter} from './meter-schedule-v11.js';
 import {indexMeters} from './meter-spatial.js';
 import {createBasemapLoader} from './viewport-basemap.js';
+import {readPackedMeters} from './meter-packed.js';
 // Time-aware meter inventory; official curb geometry, no sign matching.
 const $=id=>document.getElementById(id),status=$('status'),mapStatus=$('map-status');
 const base='https://data.cityofnewyork.us';
 const empty=()=>({type:'FeatureCollection',features:[]});
 const bryant=[-73.9832,40.7536];let center=[...bryant],inventory=null,map=null,ready=false,loadId=0,visible=[],localCount=0;
 function el(tag,str,parent){const n=document.createElement(tag);n.textContent=str;parent.append(n);return n;}
-async function json(url,signal){
+async function request(url,signal,read){
  const controller=new AbortController(),abort=()=>controller.abort();
  const timer=setTimeout(abort,30000);
  if(signal?.aborted)abort();
@@ -18,12 +19,13 @@ async function json(url,signal){
  try{
   const response=await fetch(url,{signal:controller.signal});
   if(!response.ok)throw Error('HTTP '+response.status);
-  return await response.json();
+  return await read(response);
  }finally{
   clearTimeout(timer);
   signal?.removeEventListener('abort',abort);
  }
 }
+const json=(url,signal)=>request(url,signal,response=>response.json());
 function normalize(input){const raw=Array.isArray(input)?input:input?.features;if(!Array.isArray(raw))throw Error('Invalid data response');return raw.flatMap(row=>{const geometry=row.geometry||row.the_geom,p=row.properties||row;if(!['LineString','MultiLineString'].includes(geometry?.type))return [];const lines=geometry.type==='LineString'?[geometry.coordinates]:geometry.coordinates;if(!Array.isArray(lines)||!lines.length||!lines.every(line=>Array.isArray(line)&&line.length>=2&&line.every(c=>Array.isArray(c)&&Number.isFinite(c[0])&&Number.isFinite(c[1])&&c[0]>=-180&&c[0]<=180&&c[1]>=-90&&c[1]<=90)))return [];return [{type:'Feature',geometry,properties:Object.fromEntries(Object.entries(p).filter(([k,v])=>k!=='the_geom'&&k!=='geometry'&&typeof v==='string'))}];});}
 const nyClock=new Intl.DateTimeFormat('sv-SE',{timeZone:'America/New_York',year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit',hourCycle:'h23'});
 function nyNow(){return nyClock.format(new Date()).replace(' ','T');}
@@ -127,13 +129,13 @@ arrival.onchange=()=>{live=false;render();};stay.onchange=render;$('now').onclic
 setInterval(()=>{if(live&&arrival.value!==nyNow())render();},15000);
 document.addEventListener('visibilitychange',()=>{if(!document.hidden&&live)render();});
 const snapshotStatus=$('snapshot-status');
-let meterDataNote='',meterLoadWarning='',meterDataStale=false;
+let meterDataNote='',meterLoadWarning='',meterDataStale=false,meterRequest;
 function showMeterDataNote(){
  snapshotStatus.textContent=[meterDataNote,meterLoadWarning].filter(Boolean).join(' ');
 }
 function snapshotNote(snapshot){
  const timestamp=snapshot?.metadata?.fetchedAt;
- const time=Date.parse(timestamp);
+ const time=typeof timestamp==='string'?Date.parse(timestamp):NaN;
  if(!Number.isFinite(time)||time>Date.now())return {note:'NYC meter snapshot. Refresh date unavailable.',stale:false};
  const stale=Date.now()-time>45*24*60*60*1000;
  const version=String(snapshot.metadata.version??'');
@@ -143,26 +145,43 @@ function snapshotNote(snapshot){
 async function load(){
  const day=new Date().toISOString().slice(0,10);
  // Bot commits update main without rebuilding branch-published GitHub Pages.
- const snapshotUrl=['localhost','127.0.0.1','[::1]'].includes(location.hostname)
-  ?'./data/meters.json'
-  :'https://raw.githubusercontent.com/chrisgaun/curbnyc/main/data/meters.json';
+ const snapshotBase=['localhost','127.0.0.1','[::1]'].includes(location.hostname)
+  ?'./data/'
+  :'https://raw.githubusercontent.com/chrisgaun/curbnyc/main/data/';
  const id=++loadId;
+ meterRequest?.abort();
+ const controller=new AbortController();
+ meterRequest=controller;
+ const {signal}=controller;
  status.textContent='Loading official NYC meter inventory…';
  try{
   let features,source;
   try{
-   const snapshot=await json(snapshotUrl+'?day='+day);
-   features=normalize(snapshot);
-   if(features.length<9000)throw Error('Incomplete meter snapshot');
-   source=snapshotNote(snapshot);
-  }catch{
+   if(typeof DecompressionStream==='function'){
+    try{
+     const compact=await request(snapshotBase+'meters-v1.bin.gz?day='+day,signal,readPackedMeters);
+     if(compact.features.length<9000)throw Error('Incomplete compact meter snapshot');
+     features=compact.features;
+     source=snapshotNote(compact);
+    }catch(error){
+     if(signal.aborted)throw error;
+    }
+   }
+   if(!features){
+    const snapshot=await json(snapshotBase+'meters.json?day='+day,signal);
+    features=normalize(snapshot);
+    if(features.length<9000)throw Error('Incomplete meter snapshot');
+    source=snapshotNote(snapshot);
+   }
+  }catch(error){
+   if(signal.aborted)throw error;
    const rows=[];
    for(let offset=0;offset<30000;offset+=5000){
     const url=new URL(base+'/resource/e7yp-wx55.json');
     url.searchParams.set('$limit','5000');
     url.searchParams.set('$offset',String(offset));
     url.searchParams.set('$order',':id');
-    const page=await json(url);
+    const page=await json(url,signal);
     if(!Array.isArray(page))throw Error('Expected meter records');
     rows.push(...page);
     if(page.length<5000)break;
@@ -191,6 +210,8 @@ async function load(){
   }else{
    status.textContent='Meter load failed: '+e.message+'. Try Reload data or check the official NYC map.';
   }
+ }finally{
+  if(meterRequest===controller)meterRequest=undefined;
  }
 }
 const basemap=createBasemapLoader({

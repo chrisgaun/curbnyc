@@ -8,6 +8,8 @@ import pathlib
 import urllib.parse
 import urllib.request
 
+from pack_meters import PACKED, pack_snapshot
+
 SOURCE = "https://data.cityofnewyork.us/resource/e7yp-wx55.json"
 SNAPSHOT = pathlib.Path("data/meters.json")
 PAGE_SIZE = 5000
@@ -87,9 +89,20 @@ def main():
     fetched_at = datetime.datetime.now(datetime.timezone.utc).isoformat(timespec="seconds")
     snapshot = build_snapshot(rows, previous_count, fetched_at)
     SNAPSHOT.parent.mkdir(exist_ok=True)
+    try:
+        compact = pack_snapshot(snapshot)
+    except ValueError as error:
+        compact = None
+        print(f"Compact meter snapshot skipped: {error}")
     temporary = SNAPSHOT.with_suffix(".json.tmp")
     temporary.write_bytes(encode(snapshot))
     os.replace(temporary, SNAPSHOT)
+    if compact is None:
+        PACKED.unlink(missing_ok=True)
+    else:
+        temporary_pack = PACKED.with_suffix(".gz.tmp")
+        temporary_pack.write_bytes(compact)
+        os.replace(temporary_pack, PACKED)
     print(f"Wrote {snapshot['metadata']['recordCount']} official meter blockfaces")
 
 
