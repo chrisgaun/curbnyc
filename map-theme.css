@@ -95,3 +95,20 @@ a { color: var(--link); }
   outline: 2px solid var(--focus-ring);
   outline-offset: 4px;
 }
+
+.map-summary {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 4px 8px;
+}
+.map-summary .legend { grid-column: 1 / -1; }
+.map-summary #nearby-toggle { min-height: 44px; white-space: nowrap; }
+.curb-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+.curb-card-header button { min-height: 44px; flex: none; }
+#results:focus-visible { outline: 2px solid var(--focus-ring); outline-offset: 2px; }
