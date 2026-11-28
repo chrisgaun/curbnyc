@@ -48,6 +48,7 @@ On browsers with gzip streaming support, the active map first tries the lossless
 - [Street-cleaning calendar and curb exclusions](docs/asp-and-curb-exclusions.md)
 - [Search and local preferences](docs/mobile-search.md)
 - [Android release preflight](docs/android-preflight.md)
+- [GitHub Pages release checks](docs/pages-release.md)
 
 ## Midtown vector tile pilot
 
