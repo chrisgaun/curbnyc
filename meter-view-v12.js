@@ -76,7 +76,7 @@ function details(p,parent){
  scheduleSection(wrap,'Passenger rates',valid(p.all_vehi_2)?String(p.all_vehi_2).split(/\s+\/\s+/):[]);
  scheduleSection(wrap,'Commercial parking',valid(p.commerci_1)?String(p.commerci_1).split(/,\s*/):[]);
 }
-function card(p,node){el('strong',heading(p),node);const title=el('div',labels[p.state]||'Check signs',node);title.className='curb-state';title.dataset.state=Object.hasOwn(labels,p.state)?p.state:'unknown';
+function card(p,node){const header=el('div','',node);header.className='curb-card-header';el('strong',heading(p),header);const title=el('div',labels[p.state]||'Check signs',node);title.className='curb-state';title.dataset.state=Object.hasOwn(labels,p.state)?p.state:'unknown';
  if(p.state==='paid'){
   const rate=p.firstRate===''||p.firstRate==null?'Meter rate needs review'
    :'$'+Number(p.firstRate).toFixed(2)+(p.rateMinutes===60?' first hour':' per '+p.rateMinutes+' min');
@@ -86,7 +86,7 @@ function card(p,node){el('strong',heading(p),node);const title=el('div',labels[p
  if(p.plannedText)el('div',p.plannedText,node);
  if(p.state==='restricted'||p.state==='unknown')el('div',p.reason||'',node);
  if(p.maxHours)el('small',(p.maxHours<1?p.maxHours*60+' min':p.maxHours+'h')+' posted meter limit'+(p.pay_by_cel?' · Zone '+p.pay_by_cel:''),node);else if(p.pay_by_cel)el('small','ParkNYC zone '+p.pay_by_cel,node);
- const more=el('details','',node);more.className='meter-schedule';el('summary','Full meter schedule',more);details(p,more);el('small','Meter schedule only. Check all posted signs.',node).className='caveat';}
+ const more=el('details','',node);more.className='meter-schedule';el('summary','Full meter schedule',more);details(p,more);el('small','Meter schedule only. Check all posted signs.',node).className='caveat';return header;}
 let lastAspWindow;
 const aspDate=new Intl.DateTimeFormat('en-US',{month:'short',day:'numeric',year:'numeric',timeZone:'UTC'});
 function syncClock(){
@@ -229,7 +229,22 @@ function renderList(){
   article=>article.querySelector('.meter-schedule').open
  ).map(article=>article.dataset.curbId));
  list.replaceChildren();
- if(!visible.length)el('p',localCount?'No blockfaces pass this filter. Change settings to show restricted curbs.':'No meter records in this area.',list);
+ if(!visible.length){
+  const message=localCount?'All nearby meter records are hidden by your settings.':
+   'No meter records within '+$('radius').value+' m of this map location.';
+  el('p',message,list);
+  const retry=el('button',localCount?'Show restricted curbs':'Browse Bryant Park',list);
+  retry.type='button';
+  retry.onclick=()=>{
+   if(localCount){
+    hide.checked=false;
+    hide.onchange();
+   }else{
+    $('bryant').click();
+   }
+   list.focus();
+  };
+ }
  const rank={paid:1,inactive:0,unknown:2,restricted:3};
  const cards=[...visible].sort((a,b)=>rank[a.properties.state]-rank[b.properties.state]).slice(0,40);
  const selected=visibleById.get(nearbySelected);
@@ -239,9 +254,9 @@ function renderList(){
   const id=featureIds.get(feature.geometry);
   const article=el('article','',list);
   article.dataset.curbId=id;
-  card(feature.properties,article);
+  const header=card(feature.properties,article);
   article.querySelector('.meter-schedule').open=expanded.has(String(id));
-  const button=el('button','Show on map',article);
+  const button=el('button','Show on map',header);
   button.dataset.curbId=id;
   button.disabled=!ready;
   button.setAttribute('aria-label','Show on map: '+heading(feature.properties));
@@ -250,7 +265,18 @@ function renderList(){
  }
  if(focused!==undefined)(nextFocus??nearbyPanel.querySelector('summary')).focus({preventScroll:true});
 }
-nearbyPanel.addEventListener('toggle',()=>{if(nearbyPanel.open)renderList();});
+const nearbyToggle=$('nearby-toggle');
+nearbyToggle.onclick=()=>{
+ nearbyPanel.open=true;
+ renderList();
+ const results=$('results');
+ results.scrollIntoView({block:'start'});
+ results.focus({preventScroll:true});
+};
+nearbyPanel.addEventListener('toggle',()=>{
+ nearbyToggle.setAttribute('aria-expanded',String(nearbyPanel.open));
+ if(nearbyPanel.open)renderList();
+});
 function renderFocus(){
  if(ready&&gps)map.getSource('focus').setData({type:'FeatureCollection',features:[
   {type:'Feature',geometry:{type:'Point',coordinates:gps},properties:{}}
@@ -341,6 +367,8 @@ async function load(){
    render();
   }else{
    status.textContent='Meter load failed: '+e.message+'. Try Reload data or check the official NYC map.';
+   $('results').replaceChildren();
+   el('p','Meter data is unavailable. Use Reload data below to try again.',$('results'));
   }
  }finally{
   if(meterRequest===controller)meterRequest=undefined;
