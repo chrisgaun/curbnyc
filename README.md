@@ -1,10 +1,18 @@
-# CurbNYC
+# CurbCommons
 
-CurbNYC is a free, open-source NYC parking map. It shows official NYC meter blockfaces near the center of the map, with passenger-meter hours, published rates, and commercial restrictions when the meter schedule supports them.
+CurbCommons is a free, open-source NYC parking map. It shows official NYC meter blockfaces near the center of the map, with passenger-meter hours, published rates, and commercial restrictions when the meter schedule supports them.
 
 [Open the map](https://chrisgaun.github.io/curbnyc/)
 
-<img src="docs/images/curbnyc-dark.jpg" alt="CurbNYC in dark mode on a phone-width screen, showing colored meter blockfaces around Bryant Park" width="350">
+<img src="docs/images/curbnyc-dark.jpg" alt="CurbCommons in dark mode on a phone-width screen, showing colored meter blockfaces around Bryant Park" width="350">
+
+## Try it on a phone
+
+Open [the map](https://chrisgaun.github.io/curbnyc/) in your phone's browser. On Android, Chrome's menu offers **Install and create shortcut** or **Add to home screen**. Choose **Install** when offered. [Chrome web app installation help](https://support.google.com/chrome/answer/9658361?co=GENIE.Platform%3DAndroid)
+
+On iPhone, open the map in Safari, then use **Share** and **Add to Home Screen**. [Safari web app installation help](https://support.apple.com/guide/iphone/iphea86e5236/ios)
+
+Try location permission allowed and denied, search for a public NYC destination, and pan across a few blocks. Tap a curb and compare its schedule with the posted sign. For a performance report, include the app version, phone model, Android version, and whether you were on Wi-Fi or cellular. Leave private addresses out of public reports.
 
 ## Use the map
 
@@ -30,7 +38,7 @@ The calculator supports the weekly schedules, split windows, overnight intervals
 
 The regression fixtures preserve five NYC Open Data records, including West 41 Street (104933), Bedford Avenue in Williamsburg (301265), and a 30-minute Jackson Heights meter (466707). These records were compared with the live data API. The published DOT rates provide zone-level corroboration. Field signs can differ and were not independently checked.
 
-The monthly Actions refresh keeps the previous published snapshot if the response is incomplete or validation fails. **Data and nearby meters** shows the source, fetch date, and abbreviated content digest. A fetch date records when CurbNYC retrieved the data. Snapshots older than 45 days show an age warning. A failed refresh of an open map keeps its previous lines visible. The deployed app reads the snapshot directly from GitHub main so a data update can be picked up without a Pages build.
+The monthly Actions refresh keeps the previous published snapshot if the response is incomplete or validation fails. **Data and nearby meters** shows the source, fetch date, and abbreviated content digest. A fetch date records when CurbCommons retrieved the data. Snapshots older than 45 days show an age warning. A failed refresh of an open map keeps its previous lines visible. The deployed app reads the snapshot directly from GitHub main so a data update can be picked up without a Pages build.
 
 On browsers with gzip streaming support, the active map first tries the lossless compact snapshot generated alongside the canonical JSON. The compact format preserves double-precision line coordinates, feature order, and meter schedule strings. If it is unavailable or invalid, the app uses the canonical JSON and then paginated NYC Open Data. The first successful refresh after rollout publishes the compact file. For a local preview, run `python3 scripts/pack_meters.py data/meters.json` before starting the server. The generated file is managed by the refresh workflow; keep the canonical JSON in place for older browsers and the existing meter views.
 

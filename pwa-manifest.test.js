@@ -11,6 +11,11 @@ test('install manifest keeps the existing app identity under the GitHub Pages pa
  const expected='https://chrisgaun.github.io/curbnyc/';
  for(const key of ['id','start_url','scope'])assert.equal(new URL(manifest[key],deployed).href,expected,key);
  assert.equal(manifest.display,'standalone');
+ assert.equal(manifest.name,'CurbCommons');
+ assert.equal(manifest.short_name,'CurbCommons');
+ const html=readFileSync(new URL('./index.html',import.meta.url),'utf8');
+ assert.match(html,/<title>CurbCommons/);
+ assert.match(html,/<header><strong>CurbCommons<\/strong>/);
 });
 
 test('install icon files match their declared sizes and purposes',()=>{
@@ -46,7 +51,7 @@ test('service worker provides an offline screen only on app navigation without c
  for(const url of [appURL,appURL+'index.html?from=install']){
   const result=await eventFor(url);
   assert.equal(result.status,503);
-  assert.match(await result.text(),/CurbNYC is offline/);
+  assert.match(await result.text(),/CurbCommons is offline/);
   assert.equal(result.headers.get('Cache-Control'),'no-store');
  }
  assert.equal(eventFor(appURL+'data/meters.json','cors'),undefined);

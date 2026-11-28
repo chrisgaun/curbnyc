@@ -1,4 +1,4 @@
-# CurbNYC development
+# CurbCommons development
 
 - Run `npm test` and serve the repository root with `python3 -m http.server 8000`.
 - Trace the active entry point from `index.html`. Older meter scripts and `meters-baseline.html` are regression references.
