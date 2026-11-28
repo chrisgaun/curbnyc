@@ -1,7 +1,7 @@
 {
   "id": "./",
-  "name": "CurbNYC",
-  "short_name": "CurbNYC",
+  "name": "CurbCommons",
+  "short_name": "CurbCommons",
   "description": "NYC street parking meter schedules and curb guidance.",
   "start_url": "./",
   "scope": "./",
