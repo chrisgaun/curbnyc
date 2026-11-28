@@ -1,6 +1,6 @@
 import {setupDestinationSearch} from './destination-search.js';
 import {readMapPreferences,saveMapPreferences} from './map-preferences.js';
-import {applyMapTheme,applyPageTheme,mapPaint,resolveTheme} from './map-theme.js';
+import {applyMapTheme,applyMeterPatterns,applyPageTheme,mapPaint,meterLineWidth,meterPatternLayers,resolveTheme} from './map-theme.js';
 import {plannedAspDays} from './asp-calendar.js';
 import {compileMeter} from './meter-schedule-v11.js';
 import {indexMeters} from './meter-spatial.js';
@@ -32,16 +32,23 @@ const nyClock=new Intl.DateTimeFormat('sv-SE',{timeZone:'America/New_York',year:
 function nyNow(){return nyClock.format(new Date()).replace(' ','T');}
 const arrival=$('arrival'),stay=$('stay'),hide=$('hide-restricted'),radiusControl=$('radius');
 const preferences=readMapPreferences();
-const themeControl=$('theme'),systemTheme=window.matchMedia('(prefers-color-scheme: dark)');
+const themeControl=$('theme'),patternControl=$('line-patterns'),systemTheme=window.matchMedia('(prefers-color-scheme: dark)');
 themeControl.value=preferences.theme;
+patternControl.checked=preferences.linePatterns;
 let theme=resolveTheme(themeControl.value,systemTheme.matches);
 applyPageTheme(document.documentElement,theme);
+function syncPatterns(){
+ document.documentElement.dataset.linePatterns=String(patternControl.checked);
+ if(ready)applyMeterPatterns(map,theme,patternControl.checked);
+}
+syncPatterns();
 function syncTheme(){
  const next=resolveTheme(themeControl.value,systemTheme.matches);
  if(next===theme)return;
  theme=next;
  applyPageTheme(document.documentElement,theme);
  if(ready)applyMapTheme(map,theme);
+ syncPatterns();
 }
 systemTheme.addEventListener('change',syncTheme);
 radiusControl.value=preferences.radius;
@@ -234,16 +241,20 @@ const basemap=createBasemapLoader({
 });
 function move(p,note){center=p;locationNote=note;if(ready)map.jumpTo({center:p,zoom:16});render();}
 function locate(auto=false){const id=++locRequest;if(!navigator.geolocation){locationNote='Location unavailable · Bryant Park preview';render();return;}if(!auto)userMoved=false;locationNote='Finding your location…';render();navigator.geolocation.getCurrentPosition(p=>{if(id!==locRequest)return;gps=[p.coords.longitude,p.coords.latitude];renderFocus();if(!userMoved)move(gps,'Near you');else render();},e=>{if(id!==locRequest)return;locationNote='Location unavailable · browsing map';render();if(!inventory)status.textContent=locationNote;},{timeout:12000,maximumAge:30000,enableHighAccuracy:true});}
+function persistPreferences(){
+ saveMapPreferences({radius:radiusControl.value,hideRestricted:hide.checked,theme:themeControl.value,linePatterns:patternControl.checked});
+}
 function updateMapPreferences(){
- saveMapPreferences({radius:radiusControl.value,hideRestricted:hide.checked,theme:themeControl.value});
+ persistPreferences();
  render();
 }
 radiusControl.onchange=updateMapPreferences;
 hide.onchange=updateMapPreferences;
 themeControl.onchange=()=>{
- saveMapPreferences({radius:radiusControl.value,hideRestricted:hide.checked,theme:themeControl.value});
+ persistPreferences();
  syncTheme();
 };
+patternControl.onchange=()=>{persistPreferences();syncPatterns();};
 window.addEventListener('online',render);
 window.addEventListener('offline',render);
 setupDestinationSearch({
@@ -257,7 +268,7 @@ setupDestinationSearch({
 });
 $('retry').onclick=load;$('loc').onclick=()=>locate(false);$('bryant').onclick=()=>{userMoved=true;++locRequest;move([...bryant],'Bryant Park');};
 try{const attribution='NYC Open Data',paint=mapPaint(theme);map=new maplibregl.Map({container:'map',center,zoom:16,minZoom:14,maxZoom:19,style:{version:8,glyphs:'https://demotiles.maplibre.org/font/{fontstack}/{range}.pbf',sources:Object.fromEntries(['buildings','parks','streets','meters','focus'].map(n=>[n,{type:'geojson',data:empty(),attribution}])),layers:[
-{id:'background',type:'background',paint:paint.background},{id:'parks',type:'fill',source:'parks',paint:paint.parks},{id:'buildings',type:'fill',source:'buildings',paint:paint.buildings},{id:'road-outline',type:'line',source:'streets',paint:{...paint['road-outline'],'line-width':['interpolate',['linear'],['zoom'],14,5,16,15,19,65]}},{id:'roads',type:'line',source:'streets',paint:{...paint.roads,'line-width':['interpolate',['linear'],['zoom'],14,3,16,13,19,63]}},{id:'street-names',type:'symbol',source:'streets',layout:{'symbol-placement':'line','text-field':['coalesce',['get','st_label'],['get','street'],['get','full_stree'],''],'text-font':['Noto Sans Regular'],'text-size':11},paint:{...paint['street-names'],'text-halo-width':1}},{id:'meters',type:'line',source:'meters',layout:{'line-cap':'round','line-join':'round'},paint:{...paint.meters,'line-width':['interpolate',['linear'],['zoom'],14,3,16,6,19,9]}},{id:'focus',type:'circle',source:'focus',paint:{...paint.focus,'circle-radius':7,'circle-stroke-width':2}}]}});
-map.addControl(new maplibregl.NavigationControl({showCompass:false}),'top-right');map.once('load',()=>{ready=true;applyMapTheme(map,theme);map.jumpTo({center});render();renderFocus();basemap();map.on('dragstart',()=>{userMoved=true;});map.on('moveend',()=>{const c=map.getCenter();const moved=Math.hypot(c.lng-center[0],c.lat-center[1])>0.00001;if(moved){center=[c.lng,c.lat];locationNote='Browsing map';render();}basemap();});map.on('click','meters',e=>{const p=visibleById.get(e.features[0].properties.id)?.properties;if(!p)return;const node=document.createElement('div');card(p,node);new maplibregl.Popup({maxWidth:'300px'}).setLngLat(e.lngLat).setDOMContent(node).addTo(map);});});map.on('error',e=>{if(!ready)mapStatus.textContent='Map error: '+(e.error?.message||'Map could not initialize')+'; meter list works independently.';});setTimeout(()=>{if(!ready)mapStatus.textContent='Map not ready. Meter list loads independently.';},12000);
+{id:'background',type:'background',paint:paint.background},{id:'parks',type:'fill',source:'parks',paint:paint.parks},{id:'buildings',type:'fill',source:'buildings',paint:paint.buildings},{id:'road-outline',type:'line',source:'streets',paint:{...paint['road-outline'],'line-width':['interpolate',['linear'],['zoom'],14,5,16,15,19,65]}},{id:'roads',type:'line',source:'streets',paint:{...paint.roads,'line-width':['interpolate',['linear'],['zoom'],14,3,16,13,19,63]}},{id:'street-names',type:'symbol',source:'streets',layout:{'symbol-placement':'line','text-field':['coalesce',['get','st_label'],['get','street'],['get','full_stree'],''],'text-font':['Noto Sans Regular'],'text-size':11},paint:{...paint['street-names'],'text-halo-width':1}},{id:'meters',type:'line',source:'meters',layout:{'line-cap':'round','line-join':'round'},paint:{...paint.meters,'line-width':meterLineWidth,'line-opacity':patternControl.checked?0:1}},...meterPatternLayers(theme,patternControl.checked),{id:'focus',type:'circle',source:'focus',paint:{...paint.focus,'circle-radius':7,'circle-stroke-width':2}}]}});
+map.addControl(new maplibregl.NavigationControl({showCompass:false}),'top-right');map.once('load',()=>{ready=true;applyMapTheme(map,theme);syncPatterns();map.jumpTo({center});render();renderFocus();basemap();map.on('dragstart',()=>{userMoved=true;});map.on('moveend',()=>{const c=map.getCenter();const moved=Math.hypot(c.lng-center[0],c.lat-center[1])>0.00001;if(moved){center=[c.lng,c.lat];locationNote='Browsing map';render();}basemap();});map.on('click','meters',e=>{const p=visibleById.get(e.features[0].properties.id)?.properties;if(!p)return;const node=document.createElement('div');card(p,node);new maplibregl.Popup({maxWidth:'300px'}).setLngLat(e.lngLat).setDOMContent(node).addTo(map);});});map.on('error',e=>{if(!ready)mapStatus.textContent='Map error: '+(e.error?.message||'Map could not initialize')+'; meter list works independently.';});setTimeout(()=>{if(!ready)mapStatus.textContent='Map not ready. Meter list loads independently.';},12000);
 }catch(e){mapStatus.textContent='Map unavailable: '+e.message+'; meter list works independently.';}
 load();locate(true);if('serviceWorker' in navigator)navigator.serviceWorker.register('./sw.js').catch(()=>{});
