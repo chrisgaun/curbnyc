@@ -9,7 +9,7 @@ CurbNYC is a free, open-source NYC parking map. It shows official NYC meter bloc
 ## Use the map
 
 - Start near your location or browse from Bryant Park. Use **Search** to find an NYC address or place. The app sends search text to NYC Planning when you submit it.
-- Tap a colored curb for the published meter schedule, rate estimate when available, and commercial restrictions. Use **Settings** to plan a stay, set the search radius, or select System, Light, or Dark.
+- Tap a colored curb for the published meter schedule, rate estimate when available, and commercial restrictions. Use **Settings** to plan a stay, set the search radius, select System, Light, or Dark, or turn on line patterns to distinguish curb states by more than color.
 - Expand **Data and nearby meters** for the snapshot date, nearby list, and planned street-cleaning suspensions. Check NYC311 for current suspension status, including emergency updates.
 
 Check posted signs and the curb. A blockface with no scheduled meter payment can still have other restrictions. Coverage is limited to official meter records. The app does not show vacancy, validate individual street-cleaning rules, or map hydrant, bus stop, and temporary exclusions. The non-metered sign pilot remains offline.

@@ -40,3 +40,30 @@ export function applyPageTheme(root,theme){
  root.dataset.theme=theme;
  for(const [state,color] of Object.entries(palettes[theme].status))root.style.setProperty('--curb-'+state,color);
 }
+
+const patterns={
+ paid:null,
+ inactive:[3,1.75],
+ restricted:[3,1.4,0.6,1.4],
+ unknown:[0.6,2.2]
+};
+
+export const meterLineWidth=['interpolate',['linear'],['zoom'],14,3,16,6,19,9];
+
+export function meterPatternLayers(theme,enabled){
+ return Object.entries(patterns).map(([state,dash])=>({
+  id:'meter-pattern-'+state,type:'line',source:'meters',
+  filter:['==',['get','state'],state],
+  layout:{'line-cap':'round','line-join':'round',visibility:enabled?'visible':'none'},
+  paint:{'line-color':palettes[theme].status[state],'line-width':meterLineWidth,...(dash&&{'line-dasharray':dash})}
+ }));
+}
+
+export function applyMeterPatterns(map,theme,enabled){
+ // Keep the original continuous line as the tap target, including dash gaps.
+ map.setPaintProperty('meters','line-opacity',enabled?0:1);
+ for(const {id,paint,layout} of meterPatternLayers(theme,enabled)){
+  map.setPaintProperty(id,'line-color',paint['line-color']);
+  map.setLayoutProperty(id,'visibility',layout.visibility);
+ }
+}

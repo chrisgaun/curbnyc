@@ -66,3 +66,21 @@ a { color: var(--link); }
 [data-theme="dark"] :is(.maplibregl-popup-anchor-bottom, .maplibregl-popup-anchor-bottom-left, .maplibregl-popup-anchor-bottom-right) .maplibregl-popup-tip { border-top-color: var(--surface); }
 [data-theme="dark"] .maplibregl-popup-anchor-left .maplibregl-popup-tip { border-right-color: var(--surface); }
 [data-theme="dark"] .maplibregl-popup-anchor-right .maplibregl-popup-tip { border-left-color: var(--surface); }
+
+.legend-stroke {
+  display: inline-block;
+  inline-size: 18px;
+  block-size: 3px;
+  border-radius: 2px;
+  background: currentColor;
+  vertical-align: middle;
+}
+[data-line-patterns="true"] .legend [data-state="inactive"] .legend-stroke {
+  background: repeating-linear-gradient(to right,currentColor 0 5px,transparent 5px 8px);
+}
+[data-line-patterns="true"] .legend [data-state="unknown"] .legend-stroke {
+  background: repeating-linear-gradient(to right,currentColor 0 2px,transparent 2px 5px);
+}
+[data-line-patterns="true"] .legend [data-state="restricted"] .legend-stroke {
+  background: repeating-linear-gradient(to right,currentColor 0 5px,transparent 5px 7px,currentColor 7px 9px,transparent 9px 12px);
+}

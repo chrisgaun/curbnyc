@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import {applyMapTheme,applyPageTheme,mapPaint,resolveTheme} from './map-theme.js';
+import {applyMapTheme,applyMeterPatterns,applyPageTheme,mapPaint,meterPatternLayers,resolveTheme} from './map-theme.js';
 
 function brightness(hex){
  const channels=hex.slice(1).match(/../g).map(channel=>{
@@ -44,4 +44,16 @@ test('switching map appearance updates paint only',()=>{
  const map={setPaintProperty(layer){layers.add(layer);}};
  applyMapTheme(map,'dark');
  assert.deepEqual(layers,new Set(['background','parks','buildings','road-outline','roads','street-names','meters','focus']));
+});
+
+test('line patterns are distinct and follow the theme without modifying data',()=>{
+ const calls=[];
+ const map={setPaintProperty(...args){calls.push(args);},setLayoutProperty(...args){calls.push(args);}};
+ const dark=meterPatternLayers('dark',true),light=meterPatternLayers('light',false);
+ assert.equal(new Set(dark.map(layer=>JSON.stringify(layer.paint['line-dasharray']))).size,4);
+ assert.ok(light.every(layer=>layer.layout.visibility==='none'));
+ assert.notEqual(dark[0].paint['line-color'],light[0].paint['line-color']);
+ applyMeterPatterns(map,'dark',true);
+ assert.deepEqual(calls[0],['meters','line-opacity',0]);
+ assert.equal(calls.length,9);
 });

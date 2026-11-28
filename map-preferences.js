@@ -8,10 +8,11 @@ export function readMapPreferences(storage){
   return {
    radius:radii.has(settings?.radius)?settings.radius:'500',
    hideRestricted:typeof settings?.hideRestricted==='boolean'?settings.hideRestricted:true,
-   theme:themes.has(settings?.theme)?settings.theme:'system'
+   theme:themes.has(settings?.theme)?settings.theme:'system',
+   linePatterns:settings?.linePatterns===true
   };
  }catch{
-  return {radius:'500',hideRestricted:true,theme:'system'};
+  return {radius:'500',hideRestricted:true,theme:'system',linePatterns:false};
  }
 }
 
@@ -20,7 +21,8 @@ export function saveMapPreferences(settings,storage){
   (storage??globalThis.localStorage).setItem(key,JSON.stringify({
    radius:settings.radius,
    hideRestricted:settings.hideRestricted,
-   theme:themes.has(settings.theme)?settings.theme:'system'
+   theme:themes.has(settings.theme)?settings.theme:'system',
+   linePatterns:settings.linePatterns===true
   }));
  }catch{
   // The current controls work when storage is unavailable.
