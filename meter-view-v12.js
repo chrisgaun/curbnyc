@@ -176,25 +176,34 @@ function showNearbyCurb(feature,id){
 
 function renderList(){
  if(!inventory)return;
- const list=$('results');
- const focused=list.contains(document.activeElement)?document.activeElement.dataset.curbId:undefined;
+ const list=$('results'),active=document.activeElement;
+ const focusedCard=active?.closest('article[data-curb-id]');
+ const focused=focusedCard&&list.contains(focusedCard)?focusedCard.dataset.curbId:undefined;
+ const focusSelector=active?.matches('.meter-schedule > summary')?'.meter-schedule > summary':'button[data-curb-id]';
+ const expanded=new Set([...list.querySelectorAll('article[data-curb-id]')].filter(
+  article=>article.querySelector('.meter-schedule').open
+ ).map(article=>article.dataset.curbId));
  list.replaceChildren();
  if(!visible.length)el('p',localCount?'No blockfaces pass this filter. Change settings to show restricted curbs.':'No meter records in this area.',list);
  const rank={paid:1,inactive:0,unknown:2,restricted:3};
  const cards=[...visible].sort((a,b)=>rank[a.properties.state]-rank[b.properties.state]).slice(0,40);
  const selected=visibleById.get(nearbySelected);
  if(selected&&!cards.includes(selected))cards[cards.length-1]=selected;
+ let nextFocus;
  for(const feature of cards){
-  const article=el('article','',list);
-  card(feature.properties,article);
-  const button=el('button','Show on map',article);
   const id=featureIds.get(feature.geometry);
+  const article=el('article','',list);
+  article.dataset.curbId=id;
+  card(feature.properties,article);
+  article.querySelector('.meter-schedule').open=expanded.has(String(id));
+  const button=el('button','Show on map',article);
   button.dataset.curbId=id;
   button.disabled=!ready;
   button.setAttribute('aria-label','Show on map: '+heading(feature.properties));
   button.onclick=()=>showNearbyCurb(feature,id);
+  if(focused===String(id))nextFocus=article.querySelector(focusSelector);
  }
- if(focused!==undefined)returnToNearby(focused);
+ if(focused!==undefined)(nextFocus??nearbyPanel.querySelector('summary')).focus({preventScroll:true});
 }
 nearbyPanel.addEventListener('toggle',()=>{if(nearbyPanel.open)renderList();});
 function renderFocus(){
